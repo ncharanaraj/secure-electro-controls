@@ -152,6 +152,6 @@
                                           { "id": 152, "name": "Water Pump 1HP 230v ", "price": 13500.0, "category": "Motors & Controller", "img": "images/vguard-pump-1hp.webp" },
                                                  { "id": 153, "name": "Water Pump 1.5HP 230v ", "price": 15500.0, "category": "Motors & Controller", "img": "images/vguard-pump-1.5hp.webp" },
       { "id": 153, "name": "Water Pump Starter ( 0.5 HP to 1.5 HP ) 230V ", "price": 800.0, "category": "Motors & Controller", "img": "images/1hp-starter.webp" },
-      { "id": 153, "name": "Water Pump Starter ( 3HP to 5HP ) 415V ", "price": 2500.0, "category": "Motors & Controller", "img": "" },
+      { "id": 153, "name": "Water Pump Starter ( 3HP to 5HP ) 415V ", "price": 2500.0, "category": "Motors & Controller", "img": "images/3ph-starter.webp" },
       { "id": 153, "name": "Water Pump 1.5HP 230v ", "price": 15500.0, "category": "Motors & Controller", "img": "images/vguard-pump-1.5hp.webp" }
 ]

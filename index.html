@@ -3,15 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Electro Controls - Online Shop</title>
-   <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZQ45DW40L5"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-ZQ45DW40L5');
-  </script>
+  <title>Secure Electro Controls - Auto Quotation Catalog</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { margin: 0; background-color: #f4f6f9; color: #333; padding-bottom: 90px; }
@@ -20,14 +12,13 @@
     header .brand-title h1 { margin: 0; font-size: 18px; font-weight: 700; }
     header .brand-title p { margin: 3px 0 0; font-size: 11px; opacity: 0.9; }
     
-    .cart-icon-btn { background: #ff9800; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.2s; }
-    .cart-icon-btn:hover { background: #f57c00; }
-    .cart-badge-count { background: #d32f2f; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; }
+    .action-btn { background: #ff9800; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.2s; }
+    .action-btn:hover { background: #f57c00; }
+    .badge-count { background: #d32f2f; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; }
 
     .container { max-width: 1100px; margin: 20px auto; padding: 0 12px; }
     .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .search-box { flex: 1; min-width: 200px; padding: 10px 14px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; outline: none; transition: 0.2s; }
-    .search-box:focus { border-color: #0d47a1; box-shadow: 0 0 5px rgba(13,71,161,0.2); }
+    .search-box { flex: 1; min-width: 200px; padding: 10px 14px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
     .category-select { padding: 10px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; background: white; outline: none; cursor: pointer; }
     
     .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; }
@@ -35,116 +26,97 @@
       .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
     }
     
-    .card { background: white; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.06); padding: 12px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #eaeaea; transition: transform 0.2s, box-shadow 0.2s; }
-    .card:hover { transform: translateY(-3px); box-shadow: 0 5px 12px rgba(0,0,0,0.1); }
-    
-    .img-container { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; background: #fafafa; border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+    .card { background: white; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.06); padding: 12px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #eaeaea; }
+    .img-container { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; background: #fafafa; border-radius: 8px; overflow: hidden; margin-bottom: 8px; cursor: pointer; }
     .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
-    @media (min-width: 768px) {
-      .img-container { height: 160px; }
-      .card { padding: 15px; }
-    }
     
     .card h3 { font-size: 13px; margin: 6px 0; color: #1a237e; min-height: 35px; line-height: 1.3; font-weight: 600; }
     .card .category-tag { font-size: 10px; color: #555; background: #e8eaf6; padding: 3px 8px; border-radius: 4px; width: fit-content; margin-bottom: 6px; font-weight: 500; }
-    .card p.price { font-size: 16px; font-weight: bold; color: #2e7d32; margin: 4px 0 10px; }
+    .price-tag { font-size: 13px; font-weight: 600; color: #d32f2f; margin: 4px 0 8px; font-style: italic; }
     
     .btn { background: #1976d2; color: white; border: none; padding: 9px 10px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 13px; font-weight: 600; transition: 0.2s; }
     .btn:hover { background: #115293; }
-    .btn-whatsapp { background: #25D366; color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
-    .btn-whatsapp:hover { background: #20ba5a; }
+    .btn-whatsapp { background: #25D366; color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-    #toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2e7d32; color: white; padding: 10px 22px; border-radius: 30px; font-size: 14px; transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 1000; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    
-    .cart-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: flex-end; z-index: 1000; backdrop-filter: blur(2px); }
-    .cart-modal-overlay.open { display: flex; }
-    
-    .cart-modal-content { background: white; width: 100%; max-width: 420px; height: 100%; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
-    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    /* Modal Styling */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: flex-end; z-index: 1000; }
+    .modal-overlay.open { display: flex; }
+    .modal-content { background: white; width: 100%; max-width: 420px; height: 100%; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); }
+    .modal-header { background: #0d47a1; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .close-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
+    .modal-body { padding: 15px 20px; flex: 1; overflow-y: auto; }
+    .modal-footer { padding: 15px 20px; background: #f9f9f9; border-top: 1px solid #eee; }
 
-    .cart-modal-header { background: #0d47a1; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-    .close-modal-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
-    
-    .cart-modal-body { padding: 15px 20px; flex: 1; overflow-y: auto; }
-    .cart-modal-footer { padding: 15px 20px; background: #f9f9f9; border-top: 1px solid #eee; flex-shrink: 0; max-height: 55vh; overflow-y: auto; }
-    
     .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px; }
     .qty-controls { display: flex; align-items: center; gap: 6px; }
-    .qty-btn { background: #e0e0e0; border: none; width: 26px; height: 26px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.1s; }
-    .qty-btn:hover { background: #d0d0d0; }
-    
-    footer { text-align: center; padding: 18px; font-size: 12px; color: #666; background: #fff; border-top: 1px solid #eee; margin-top: 40px; }
+    .qty-btn { background: #e0e0e0; border: none; width: 24px; height: 24px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+    /* Image Zoom Modal */
+    .zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; }
+    .zoom-modal.open { display: flex; }
+    .zoom-content { max-width: 90%; max-height: 80vh; border-radius: 8px; background: white; padding: 10px; }
+
+    #toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2e7d32; color: white; padding: 10px 22px; border-radius: 30px; font-size: 14px; transition: 0.3s; opacity: 0; z-index: 3000; font-weight: 600; }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   </style>
 </head>
 <body>
 
-  <div id="toast">✅ Added to cart successfully!</div>
+  <div id="toast">✅ Added to list successfully!</div>
 
   <header>
     <div class="brand-title">
       <h1>Secure Electro Controls</h1>
-      <p>Smart Electricals & Industrial Automation | Sirsi (581340)</p>
+      <p>Smart Electricals & Automation | Sirsi</p>
     </div>
-    <button class="cart-icon-btn" onclick="toggleCartModal()">
-      🛒 Cart <span class="cart-badge-count" id="headerCartCount">0</span>
+    <button class="action-btn" onclick="toggleCartModal()">
+      📋 My Requirement List <span class="badge-count" id="headerCount">0</span>
     </button>
   </header>
 
-  <div class="cart-modal-overlay" id="cartModal" onclick="handleOverlayClick(event)">
-    <div class="cart-modal-content">
-      <div class="cart-modal-header">
-        <h2 style="font-size:16px; margin:0;">🛒 Your Selected Order List</h2>
-        <button class="close-modal-btn" onclick="toggleCartModal()">&times;</button>
-      </div>
-      <div class="cart-modal-body" id="cartModalItems">
-        <p style="color:#777; text-align:center; margin-top:40px;">No items selected yet.</p>
-      </div>
-      <div class="cart-modal-footer" id="cartModalFooter" style="display:none;">
-        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:15px; margin-bottom:12px;">
-          <span>Total Estimated Price:</span>
-          <span id="cartModalTotal" style="color:#2e7d32;">₹0</span>
-        </div>
-
-        <div style="margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px;">
-          <input type="text" id="custName" placeholder="Customer Name *" style="padding: 9px 12px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none;" required>
-          <input type="text" id="custPhone" placeholder="Mobile Number *" style="padding: 9px 12px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none;" required>
-          <textarea id="custAddress" placeholder="Delivery Address / Location *" rows="2" style="padding: 9px 12px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; resize: none; outline: none;" required></textarea>
-        </div>
-
-        <button class="btn-whatsapp" onclick="sendWhatsAppOrder()">Send Order via WhatsApp 💬</button>
-      </div>
-    </div>
-  </div>
-
   <div class="container">
-    <h2 style="font-size: 18px; color: #0d47a1; margin-bottom: 12px;">Electrical Products Catalog</h2>
+    <h2 style="font-size: 18px; color: #0d47a1; margin-bottom: 12px;">Products Catalog</h2>
     
     <div class="controls">
-      <input type="text" id="searchInput" class="search-box" placeholder="Search items by name..." onkeyup="filterProducts()">
-      <select id="categoryFilter" class="category-select" onchange="filterProducts()">
+      <input type="text" id="searchInput" class="search-box" placeholder="Search items by name..." onkeyup="renderProducts()">
+      <select id="categoryFilter" class="category-select" onchange="renderProducts()">
         <option value="ALL">All Categories</option>
         <option value="Switches & Sockets">Switches & Sockets</option>
         <option value="Holders & Lighting">Holders & Lighting</option>
         <option value="Wires & Cables">Wires & Cables</option>
-        <option value="PVC Pipes & Fittings">PVC Pipes & Fittings</option>
-        <option value="Casing Patti & Fittings">Casing Patti & Fittings</option>
-        <option value="PVC Plates & Boxes">PVC Plates & Boxes</option>
-        <option value="Concealed Boxes">Concealed Boxes</option>
         <option value="MCB & RCCB">MCB & RCCB</option>
-        <option value="DB Boxes">DB Boxes</option>
-        <option value="CCTV & Home Automation">CCTV & Home Automation</option>
         <option value="Industrial Automation">Industrial Automation</option>
-        <option value="Motors & Controller">Motors & Controller</option>
       </select>
     </div>
     
     <div class="product-grid" id="productGrid"></div>
   </div>
 
-  <footer>
-    <p>© Secure Electro Controls - Call: 7892369689</p>
-  </footer>
+  <!-- Cart / Request Modal -->
+  <div class="modal-overlay" id="cartModal" onclick="handleOverlayClick(event)">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 style="font-size:16px; margin:0;">📋 Selected Requirement List</h2>
+        <button class="close-btn" onclick="toggleCartModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="cartModalItems">
+        <p style="color:#777; text-align:center; margin-top:40px;">No items selected yet.</p>
+      </div>
+      <div class="modal-footer" id="cartModalFooter" style="display:none;">
+        <div style="margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px;">
+          <input type="text" id="custName" placeholder="Customer Name *" style="padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+          <input type="text" id="custPhone" placeholder="Mobile Number *" style="padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
+          <textarea id="custAddress" placeholder="Delivery Location / Note *" rows="2" style="padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; resize:none;"></textarea>
+        </div>
+        <button class="btn-whatsapp" onclick="sendAutoQuotation()">Send Auto-Quotation via WhatsApp 💬</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Zoom Modal -->
+  <div class="zoom-modal" id="zoomModal" onclick="closeZoom()">
+    <img class="zoom-content" id="zoomedImg" src="" alt="Zoom">
+  </div>
 
   <script>
     const defaultPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%230d47a1' stroke-width='1.5'><rect x='2' y='6' width='20' height='12' rx='2'/><circle cx='8' cy='12' r='2'/><circle cx='16' cy='12' r='2'/></svg>";
@@ -153,185 +125,175 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       fetch('products.json')
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
           products = data;
           renderProducts();
         })
         .catch(err => {
           console.error('Error loading products.json:', err);
-          document.getElementById('productGrid').innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:red;">Failed to load products.json file.</p>';
+          document.getElementById('productGrid').innerHTML = '<p style="color:red; text-align:center;">Failed to load products.json</p>';
         });
-      updateCartBadge();
     });
 
     function renderProducts() {
-      const searchVal = document.getElementById('searchInput').value.toLowerCase();
-      const catVal = document.getElementById('categoryFilter').value;
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const cat = document.getElementById('categoryFilter').value;
       const grid = document.getElementById('productGrid');
       grid.innerHTML = '';
 
       const filtered = products.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchVal);
-        const matchesCat = (catVal === 'ALL' || p.category === catVal);
-        return matchesSearch && matchesCat;
+        return p.name.toLowerCase().includes(search) && (cat === 'ALL' || p.category === cat);
       });
 
       if(filtered.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777; padding:30px;">No matching items found.</p>';
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777;">No items found.</p>';
         return;
       }
 
-      filtered.forEach((prod) => {
+      filtered.forEach(prod => {
         let imgSrc = (prod.img && prod.img.trim() !== "") ? prod.img : defaultPlaceholder;
         grid.innerHTML += `
           <div class="card">
             <span class="category-tag">${prod.category || 'General'}</span>
-            <div class="img-container">
+            <div class="img-container" onclick="openZoom('${imgSrc}')">
               <img src="${imgSrc}" alt="${prod.name}" onerror="this.src='${defaultPlaceholder}'">
             </div>
             <h3>${prod.name}</h3>
-            <p class="price">₹${prod.price}</p>
-            <button class="btn" onclick="addToCart(${prod.id})">+ Add to Order</button>
+            <div class="price-tag">🔒 Price on Request</div>
+            <button class="btn" onclick="addToCart(${prod.id})">+ Add to List</button>
           </div>
         `;
       });
     }
 
-    function filterProducts() {
-      renderProducts();
-    }
-
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      toast.innerText = message;
-      toast.classList.add('show');
-      setTimeout(() => { toast.classList.remove('show'); }, 1500);
-    }
-
     function addToCart(id) {
       const item = products.find(p => p.id === id);
-      if (!item) return;
-
-      if (cart[id]) {
+      if(!item) return;
+      if(cart[id]) {
         cart[id].qty += 1;
       } else {
         cart[id] = { id: item.id, name: item.name, price: item.price, qty: 1 };
       }
-      updateCartBadge();
-      if(document.getElementById('cartModal').classList.contains('open')) {
-        renderCartModalContent();
-      }
-      showToast(`Added to cart: ${item.name}`);
+      updateBadge();
+      showToast(`Added: ${item.name}`);
     }
 
     function updateQty(id, change) {
-      if (cart[id]) {
+      if(cart[id]) {
         cart[id].qty += change;
-        if (cart[id].qty <= 0) { delete cart[id]; }
+        if(cart[id].qty <= 0) delete cart[id];
       }
-      updateCartBadge();
-      renderCartModalContent();
+      updateBadge();
+      renderCartContent();
     }
 
-    function updateCartBadge() {
-      let totalUnits = 0;
-      Object.keys(cart).forEach(k => totalUnits += cart[k].qty);
-      document.getElementById('headerCartCount').innerText = totalUnits;
+    function updateBadge() {
+      let total = 0;
+      Object.keys(cart).forEach(k => total += cart[k].qty);
+      document.getElementById('headerCount').innerText = total;
     }
 
     function toggleCartModal() {
       const modal = document.getElementById('cartModal');
       modal.classList.toggle('open');
-      if (modal.classList.contains('open')) {
-        renderCartModalContent();
+      if(modal.classList.contains('open')) {
+        renderCartContent();
       }
     }
 
-    function handleOverlayClick(event) {
-      if (event.target.id === 'cartModal') {
-        toggleCartModal();
-      }
+    function handleOverlayClick(e) {
+      if(e.target.id === 'cartModal') toggleCartModal();
     }
 
-    function renderCartModalContent() {
-      const cartModalItems = document.getElementById('cartModalItems');
-      const cartModalFooter = document.getElementById('cartModalFooter');
-      const cartKeys = Object.keys(cart);
+    function renderCartContent() {
+      const body = document.getElementById('cartModalItems');
+      const footer = document.getElementById('cartModalFooter');
+      const keys = Object.keys(cart);
 
-      if (cartKeys.length === 0) {
-        cartModalItems.innerHTML = '<p style="color:#777; text-align:center; margin-top:40px;">No items selected yet.</p>';
-        cartModalFooter.style.display = 'none';
+      if(keys.length === 0) {
+        body.innerHTML = '<p style="color:#777; text-align:center; margin-top:40px;">No items selected yet.</p>';
+        footer.style.display = 'none';
         return;
       }
 
       let html = '';
-      let grandTotal = 0;
-
-      cartKeys.forEach((key) => {
-        const item = cart[key];
-        const itemTotal = item.price * item.qty;
-        grandTotal += itemTotal;
-
+      keys.forEach(k => {
+        let item = cart[k];
         html += `
           <div class="cart-item">
             <div>
               <div style="font-weight:600; color:#1a237e;">${item.name}</div>
-              <div style="font-size:12px; color:#666;">₹${item.price} × ${item.qty}</div>
+              <div style="font-size:12px; color:#555; margin-top:3px;">Quantity: ${item.qty}</div>
             </div>
             <div class="qty-controls">
               <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
-              <span style="font-weight:bold; padding:0 6px;">${item.qty}</span>
+              <span style="font-weight:bold; padding:0 4px;">${item.qty}</span>
               <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
             </div>
-            <div style="font-weight:bold; color:#2e7d32;">₹${itemTotal}</div>
           </div>
         `;
       });
 
-      cartModalItems.innerHTML = html;
-      document.getElementById('cartModalTotal').innerText = '₹' + grandTotal;
-      cartModalFooter.style.display = 'block';
+      body.innerHTML = html;
+      footer.style.display = 'block';
     }
 
-    function sendWhatsAppOrder() {
-      const cartKeys = Object.keys(cart);
-      if (cartKeys.length === 0) return;
-
+    function sendAutoQuotation() {
       const name = document.getElementById('custName').value.trim();
-      const phoneNo = document.getElementById('custPhone').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
       const address = document.getElementById('custAddress').value.trim();
 
-      if (!name || !phoneNo || !address) {
-        alert("Please fill in your Name, Mobile Number, and Address!");
+      if(!name || !phone || !address) {
+        alert("Please fill in Name, Mobile Number and Location/Note!");
         return;
       }
 
-      let message = `🛒 *New Order - Secure Electro Controls*\n\n`;
-      message += `👤 *Customer Name:* ${name}\n`;
-      message += `📞 *Contact Number:* ${phoneNo}\n`;
-      message += `📍 *Delivery Address:* ${address}\n\n`;
-      message += `-----------------------------------\n`;
-      message += `*Ordered Items:*\n`;
+      let msg = `📋 *Quotation Reply - Secure Electro Controls*\n\n`;
+      msg += `👤 *Customer Name:* ${name}\n`;
+      msg += `📞 *Contact:* ${phone}\n`;
+      msg += `📍 *Note:* ${address}\n\n`;
+      msg += `-----------------------------------\n`;
+      msg += `*Priced Items List:*\n`;
 
       let grandTotal = 0;
       let count = 1;
 
-      cartKeys.forEach((key) => {
-        const item = cart[key];
-        const itemTotal = item.price * item.qty;
+      Object.keys(cart).forEach(k => {
+        let item = cart[k];
+        let itemTotal = item.price * item.qty;
         grandTotal += itemTotal;
-        message += `${count}. ${item.name} - ₹${item.price} x ${item.qty} = ₹${itemTotal}\n`;
+        msg += `${count}. ${item.name}\n   - Rate: ₹${item.price} x ${item.qty} = ₹${itemTotal}\n`;
         count++;
       });
 
-      message += `-----------------------------------\n`;
-      message += `💰 *Total Estimated Price: ₹${grandTotal}*\n\n`;
-      message += `Please confirm availability & delivery details.`;
+      msg += `-----------------------------------\n`;
+      msg += `💰 *Total Quotation Amount: ₹${grandTotal}*\n\n`;
+      msg += `Thank you for choosing Secure Electro Controls!`;
 
       const shopPhone = "917892369689"; 
-      const url = `https://wa.me/${shopPhone}?text=${encodeURIComponent(message)}`;
+      const url = `https://wa.me/${shopPhone}?text=${encodeURIComponent(urlEncodeCustom(msg))}`;
       window.open(url, '_blank');
+    }
+
+    function urlEncodeCustom(str) {
+      return encodeURIComponent(str);
+    }
+
+    function openZoom(src) {
+      document.getElementById('zoomedImg').src = src;
+      document.getElementById('zoomModal').classList.add('open');
+    }
+
+    function closeZoom() {
+      document.getElementById('zoomModal').classList.remove('open');
+    }
+
+    function showToast(txt) {
+      const t = document.getElementById('toast');
+      t.innerText = txt;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
     }
   </script>
 </body>

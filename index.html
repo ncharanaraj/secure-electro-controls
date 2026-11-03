@@ -172,7 +172,7 @@
 
   <script>
     // ⚠️ ನಿಮ್ಮ ನಿಖರವಾದ JSONBin Details ಅನ್ನು ಇಲ್ಲಿ ಹಾಕಿರಿ
-    const BIN_ID = "6ae9c1b2ac6210605a68760c";
+    const BIN_ID = "6ae9c1b2ac6210605a68760c ";
     const MASTER_KEY = "$2a$10$6XiRSIncaLwwkUOgVP.QFuGXV8cijDYq8amCJi/pVgZ.5QlSuIup6";
 
     const defaultPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%230d47a1' stroke-width='1.5'><rect x='2' y='6' width='20' height='12' rx='2'/><circle cx='8' cy='12' r='2'/><circle cx='16' cy='12' r='2'/></svg>";
@@ -353,7 +353,7 @@
       footer.style.display = 'block';
     }
 
-    // Submit Order to Cloud JSONBin & WhatsApp
+    // Submit Order to Cloud JSONBin & WhatsApp (Without Price)
     async function submitOrderToCloudBin() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
@@ -365,16 +365,29 @@
       }
 
       let orderItems = [];
-      let grandTotal = 0;
-      let itemsStr = "";
+      let basicSubtotal = 0;
+      let itemsDetails = [];
 
       Object.keys(cart).forEach(k => {
         let item = cart[k];
-        let itemTotal = (item.price || 0) * item.qty;
-        grandTotal += itemTotal;
-        orderItems.push(item);
-        itemsStr += `${item.name} (Qty: ${item.qty}), `;
+        let itemRate = item.price || 0;
+        let itemTotalWithoutTax = itemRate * item.qty;
+        basicSubtotal += itemTotalWithoutTax;
+
+        orderItems.push({
+          name: item.name,
+          qty: item.qty,
+          rate: itemRate,
+          total: itemTotalWithoutTax
+        });
+
+        itemsDetails.push(`${item.name} - Qty: ${item.qty} @ ₹${itemRate}`);
       });
+
+      // GST Calculation (Assuming 18% Total GST -> 9% CGST + 9% SGST)
+      let cgst = basicSubtotal * 0.09;
+      let sgst = basicSubtotal * 0.09;
+      let grandTotal = basicSubtotal + cgst + sgst;
 
       const newOrder = {
         id: Date.now(),
@@ -382,8 +395,11 @@
         name: name,
         phone: phone,
         address: address,
-        items: itemsStr,
-        total: "Rs." + grandTotal
+        itemsList: orderItems,
+        basicTotal: basicSubtotal.toFixed(2),
+        cgst: cgst.toFixed(2),
+        sgst: sgst.toFixed(2),
+        grandTotal: grandTotal.toFixed(2)
       };
 
       try {
@@ -408,6 +424,7 @@
         console.error('Cloud Sync Error:', err);
       }
 
+      // WhatsApp message to shop owner (Without price)
       let msg = "📋 *NEW REQUIREMENT INQUIRY*\n";
       msg += "🏢 *Secure Electro Controls*\n";
       msg += "-----------------------------------\n";
@@ -422,7 +439,7 @@
       });
 
       msg += "-----------------------------------\n";
-      msg += "Please check and send quotation.";
+      msg += "Please check admin dashboard and send quotation.";
 
       const shopPhone = "917892369689";
       const url = "https://wa.me/" + shopPhone + "?text=" + encodeURIComponent(msg);
@@ -454,6 +471,18 @@
 
         let html = '';
         orders.forEach((order) => {
+          let itemsHtml = '';
+          if (order.itemsList && Array.isArray(order.itemsList)) {
+            order.itemsList.forEach((it, idx) => {
+              itemsHtml += `<div style="font-size:13px; color:#444;">• ${idx + 1}. ${it.name} (Qty: ${it.qty}) - Rate: ₹${it.rate} = ₹${it.total}</div>`;
+            });
+          } else {
+            itemsHtml = `<div style="font-size:13px; color:#444;">• ${order.items || 'Items list'}</div>`;
+          }
+
+          // Encode order data safely for the quotation button
+          let orderJson = encodeURIComponent(JSON.stringify(order));
+
           html += `
             <div class="order-card-box" id="order-${order.id}">
               <div style="display:flex; justify-content:space-between; font-weight:bold; color:#0d47a1; margin-bottom:6px; font-size:14px;">
@@ -462,16 +491,21 @@
               </div>
               <div style="font-size:13px; color:#333; margin-bottom:6px;">📍 <b>Note:</b> ${order.address}</div>
               <div style="margin-bottom:8px; background:#fff; padding:8px; border-radius:6px; border:1px solid #ffe082;">
-                <div style="font-size:13px; color:#444;">• ${order.items}</div>
-                <div style="margin-top:6px; font-weight:bold; color:#2e7d32; font-size:13px; text-align:right;">Total: ${order.total} (Incl. GST)</div>
+                ${itemsHtml}
+                <hr style="border:0; border-top:1px dashed #ccc; margin:6px 0;">
+                <div style="font-size:12px; color:#555;">Subtotal (Without GST): ₹${order.basicTotal || 0}</div>
+                <div style="font-size:12px; color:#555;">CGST (9%): ₹${order.cgst || 0}</div>
+                <div style="font-size:12px; color:#555;">SGST (9%): ₹${order.sgst || 0}</div>
+                <div style="margin-top:4px; font-weight:bold; color:#2e7d32; font-size:13px; text-align:right;">Grand Total: ₹${order.grandTotal || order.total}</div>
               </div>
               <div style="display: flex; gap: 8px;">
-                <button class="btn" style="background:#25D366; font-size:12px; padding:7px; flex: 1;" onclick="sendQuotationToCustomer('${order.phone}', '${order.name}', '${order.items}', '${order.total}')">📲 Send Return Quotation to Customer</button>
+                <button class="btn" style="background:#25D366; font-size:12px; padding:7px; flex: 1;" onclick='sendQuotationToCustomer(${order.id})'>📲 Send Return Quotation to Customer</button>
                 <button class="btn" style="background:#d32f2f; font-size:12px; padding:7px; width: auto;" onclick="deleteCloudOrder(event, ${order.id})">❌ Delete</button>
               </div>
             </div>
           `;
         });
+        window.currentOrdersList = orders; // Store globally for easy retrieval
         body.innerHTML = html;
       } catch (err) {
         console.error('Error fetching orders:', err);
@@ -492,10 +526,8 @@
         const data = await res.json();
         let orders = data.record || [];
 
-        // Filter out the selected order
         orders = orders.filter(o => Number(o.id) !== Number(orderId));
 
-        // Update JSONBin with remaining orders
         await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
           method: 'PUT',
           headers: {
@@ -506,29 +538,50 @@
         });
 
         showToast("🗑️ Order Deleted Successfully!");
-        fetchCloudOrders(); // Refresh orders list
+        fetchCloudOrders();
       } catch (err) {
         console.error('Delete Error:', err);
         alert("Failed to delete order from cloud.");
       }
     }
 
-    // Send Quotation directly to Customer WhatsApp
-    function sendQuotationToCustomer(phone, name, items, total) {
+    // Send Professional Quotation with Separate GST to Customer WhatsApp
+    function sendQuotationToCustomer(orderId) {
+      const orders = window.currentOrdersList || [];
+      const order = orders.find(o => Number(o.id) === Number(orderId));
+      if(!order) {
+        alert("Order details not found!");
+        return;
+      }
+
       let msg = "🛒 *QUOTATION - SECURE ELECTRO CONTROLS*\n";
       msg += "📍 *Sirsi (581401) | Ph: 7892369689*\n";
       msg += "-----------------------------------\n";
-      msg += "👤 *Customer Name:* " + name + "\n";
-      msg += "📞 *Mobile Number:* " + phone + "\n";
+      msg += "👤 *Customer Name:* " + order.name + "\n";
+      msg += "📞 *Mobile Number:* " + order.phone + "\n";
+      msg += "🕒 *Date:* " + order.time + "\n";
       msg += "-----------------------------------\n";
-      msg += "*Priced Items List:*\n";
-      msg += items + "\n";
+      msg += "*Itemized Details:*\n";
+
+      if (order.itemsList && Array.isArray(order.itemsList)) {
+        order.itemsList.forEach((it, idx) => {
+          msg += (idx + 1) + ". " + it.name + "\n";
+          msg += "   - Qty: " + it.qty + " x ₹" + it.rate + " = ₹" + it.total + "\n";
+        });
+      } else {
+        msg += order.items + "\n";
+      }
+
       msg += "-----------------------------------\n";
-      msg += "💰 *Grand Total:* " + total + " \n";
-      msg += "*(Inclusive of all taxes / With GST)*\n\n";
+      msg += "📦 *Subtotal (Excl. GST):* ₹" + (order.basicTotal || 0) + "/-\n";
+      msg += "➕ *CGST (9%):* ₹" + (order.cgst || 0) + "/-\n";
+      msg += "➕ *SGST (9%):* ₹" + (order.sgst || 0) + "/-\n";
+      msg += "-----------------------------------\n";
+      msg += "💰 *Grand Total:* ₹" + (order.grandTotal || 0) + "/-\n";
+      msg += "*(Inclusive of all taxes)*\n\n";
       msg += "Thank you for choosing Secure Electro Controls!";
 
-      const url = "https://wa.me/" + phone + "?text=" + encodeURIComponent(msg);
+      const url = "https://wa.me/" + order.phone + "?text=" + encodeURIComponent(msg);
       window.open(url, '_blank');
     }
 

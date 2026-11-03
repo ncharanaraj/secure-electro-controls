@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Electro Controls - Catalog & Orders</title>
+  <title>Secure Electro Controls - Catalog & Quotation</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { margin: 0; background-color: #f4f6f9; color: #333; padding-bottom: 90px; }
@@ -12,11 +12,9 @@
     header .brand-title h1 { margin: 0; font-size: 18px; font-weight: 700; }
     header .brand-title p { margin: 3px 0 0; font-size: 11px; opacity: 0.9; }
     
-    .header-btns { display: flex; gap: 8px; }
-    .action-btn { background: #ff9800; color: #fff; border: none; padding: 8px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .action-btn { background: #ff9800; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     .action-btn:hover { background: #f57c00; }
-    .orders-btn { background: #d32f2f; }
-    .badge-count { background: #fff; color: #d32f2f; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold; }
+    .badge-count { background: #d32f2f; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; }
 
     .container { max-width: 1100px; margin: 20px auto; padding: 0 12px; }
     .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -54,7 +52,12 @@
     .qty-controls { display: flex; align-items: center; gap: 6px; }
     .qty-btn { background: #e0e0e0; border: none; width: 26px; height: 26px; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
-    /* Orders Dashboard Modal Styling */
+    /* Secret Password Modal */
+    .admin-password-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 3000; }
+    .admin-password-modal.open { display: flex; }
+    .admin-pwd-box { background: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+
+    /* Admin Orders Dashboard Modal */
     .orders-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; }
     .orders-modal.open { display: flex; }
     .orders-container { background: white; width: 95%; max-width: 650px; height: 85vh; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
@@ -68,7 +71,7 @@
     #toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2e7d32; color: white; padding: 10px 22px; border-radius: 30px; font-size: 14px; transition: 0.3s; opacity: 0; z-index: 4000; font-weight: 600; }
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-    footer { text-align: center; padding: 18px; font-size: 12px; color: #666; background: #fff; border-top: 1px solid #eee; margin-top: 40px; }
+    footer { text-align: center; padding: 18px; font-size: 12px; color: #666; background: #fff; border-top: 1px solid #eee; margin-top: 40px; cursor: pointer; user-select: none; }
   </style>
 </head>
 <body>
@@ -80,14 +83,9 @@
       <h1>Secure Electro Controls</h1>
       <p>Smart Electricals & Automation | Sirsi (581340)</p>
     </div>
-    <div class="header-btns">
-      <button class="action-btn orders-btn" onclick="toggleOrdersModal()">
-        📥 Orders <span class="badge-count" id="orderBadge">0</span>
-      </button>
-      <button class="action-btn" onclick="toggleCartModal()">
-        📋 List <span class="badge-count" id="headerCount">0</span>
-      </button>
-    </div>
+    <button class="action-btn" onclick="toggleCartModal()">
+      📋 List <span class="badge-count" id="headerCount">0</span>
+    </button>
   </header>
 
   <div class="container">
@@ -136,15 +134,25 @@
     </div>
   </div>
 
+  <!-- Secret Password Prompt Modal -->
+  <div class="admin-password-modal" id="pwdModal" onclick="handlePwdOverlay(event)">
+    <div class="admin-pwd-box">
+      <h3 style="margin-top:0; color:#0d47a1; font-size:16px;">🔐 Admin Access</h3>
+      <p style="font-size:12px; color:#666; margin-bottom:12px;">Enter Admin Password to view orders.</p>
+      <input type="password" id="adminPasswordInput" placeholder="Enter Password" style="width:100%; padding:9px; border:1px solid #ccc; border-radius:6px; font-size:14px; text-align:center; margin-bottom:12px; outline:none;">
+      <button class="btn" onclick="verifyAdminPassword()">Login</button>
+    </div>
+  </div>
+
   <!-- Admin Orders Dashboard Modal -->
   <div class="orders-modal" id="ordersModal" onclick="handleOrdersOverlay(event)">
     <div class="orders-container">
-      <div class="modal-header">
-        <h2 style="font-size:16px; margin:0;">📥 Customer Orders Dashboard</h2>
+      <div class="modal-header" style="background: #37474f;">
+        <h2 style="font-size:16px; margin:0;">🔐 Admin Orders Dashboard</h2>
         <button class="close-btn" onclick="toggleOrdersModal()">&times;</button>
       </div>
       <div class="modal-body" id="ordersListBody" style="background: #f9f9f9;">
-        <!-- Orders will load here dynamically -->
+        <!-- Orders loaded dynamically -->
       </div>
     </div>
   </div>
@@ -155,8 +163,9 @@
     <img class="img-zoom-content" id="zoomedImage" src="" alt="Zoom">
   </div>
 
+  <!-- Footer with Secret Triple-Click Trigger (Password: sec1994) -->
   <footer>
-    <p>© Secure Electro Controls - Call: 7892369689</p>
+    <p onclick="handleFooterTripleClick()">© Secure Electro Controls - Call: 7892369689</p>
   </footer>
 
   <script>
@@ -164,14 +173,14 @@
     let products = [];
     let cart = {};
     let savedOrders = [];
+    let footerClicks = 0;
+    let footerTimer = null;
 
     window.addEventListener('DOMContentLoaded', () => {
-      // Load saved orders from browser storage
       const storedOrders = localStorage.getItem('secure_shop_orders');
       if (storedOrders) {
         savedOrders = JSON.parse(storedOrders);
       }
-      updateOrderBadge();
 
       fetch('products.json')
         .then(res => res.json())
@@ -185,6 +194,35 @@
         });
       updateBadge();
     });
+
+    function handleFooterTripleClick() {
+      footerClicks++;
+      if (footerClicks === 1) {
+        footerTimer = setTimeout(() => { footerClicks = 0; }, 600);
+      } else if (footerClicks === 3) {
+        clearTimeout(footerTimer);
+        footerClicks = 0;
+        document.getElementById('pwdModal').classList.add('open');
+      }
+    }
+
+    function handlePwdOverlay(e) {
+      if(e.target.id === 'pwdModal') {
+        document.getElementById('pwdModal').classList.remove('open');
+        document.getElementById('adminPasswordInput').value = '';
+      }
+    }
+
+    function verifyAdminPassword() {
+      const pwd = document.getElementById('adminPasswordInput').value.trim();
+      if(pwd === 'sec1994') {
+        document.getElementById('pwdModal').classList.remove('open');
+        document.getElementById('adminPasswordInput').value = '';
+        toggleOrdersModal();
+      } else {
+        alert("Incorrect Password!");
+      }
+    }
 
     function renderProducts() {
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -258,10 +296,6 @@
       document.getElementById('headerCount').innerText = total;
     }
 
-    function updateOrderBadge() {
-      document.getElementById('orderBadge').innerText = savedOrders.length;
-    }
-
     function toggleCartModal() {
       const modal = document.getElementById('cartModal');
       modal.classList.toggle('open');
@@ -319,7 +353,7 @@
       footer.style.display = 'block';
     }
 
-    // Customer submits order -> Saved to local storage & WhatsApp opens for Shop owner
+    // Customer Requirement Text Format (Simple & Clean WhatsApp List)
     function submitOrderToDashboard() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
@@ -344,16 +378,15 @@
         items: orderItems
       };
 
-      // Save order permanently in browser storage
-      savedOrders.unshift(newOrder); // Add to top
+      savedOrders.unshift(newOrder);
       localStorage.setItem('secure_shop_orders', JSON.stringify(savedOrders));
-      updateOrderBadge();
 
-      // Open WhatsApp for Shop Owner
-      let msg = "📋 *New Requirement Inquiry - Secure Electro Controls*\n\n";
+      let msg = "📋 *NEW REQUIREMENT INQUIRY*\n";
+      msg += "🏢 *Secure Electro Controls*\n";
+      msg += "-----------------------------------\n";
       msg += "👤 *Customer Name:* " + name + "\n";
       msg += "📞 *Mobile Number:* " + phone + "\n";
-      msg += "📍 *Delivery Note:* " + address + "\n\n";
+      msg += "📍 *Location / Note:* " + address + "\n";
       msg += "-----------------------------------\n";
       msg += "*Required Items List:*\n";
 
@@ -361,21 +394,19 @@
         msg += (index + 1) + ". " + item.name + " - Qty: " + item.qty + "\n";
       });
 
-      msg += "\n-----------------------------------\n";
-      msg += "Saved to Orders Dashboard. Send quotation.";
+      msg += "-----------------------------------\n";
+      msg += "⚡ *Status:* Saved to Dashboard. Please send quotation.";
 
       const shopPhone = "917892369689";
       const url = "https://wa.me/" + shopPhone + "?text=" + encodeURIComponent(msg);
       window.open(url, '_blank');
 
-      // Reset Cart
       cart = {};
       updateBadge();
       toggleCartModal();
       showToast("✅ Order Saved & Sent!");
     }
 
-    // Render Orders in Dashboard
     function renderOrdersContent() {
       const body = document.getElementById('ordersListBody');
       if (savedOrders.length === 0) {
@@ -384,14 +415,14 @@
       }
 
       let html = '';
-      savedOrders.forEach((order, index) => {
+      savedOrders.forEach((order) => {
         let itemsHtml = '';
         let grandTotal = 0;
 
-        order.items.forEach((item, i) => {
+        order.items.forEach((item, index) => {
           let itemTotal = item.price * item.qty;
           grandTotal += itemTotal;
-          itemsHtml += `<div style="font-size:13px; color:#444; margin-left:10px;">• ${item.name} (Qty: ${item.qty}) - Rate: Rs.${item.price} = Rs.${itemTotal}</div>`;
+          itemsHtml += `<div style="font-size:13px; color:#444; margin-left:10px;">• ${index + 1}. ${item.name} (Qty: ${item.qty}) - Rate: Rs.${item.price} = Rs.${itemTotal}</div>`;
         });
 
         html += `
@@ -403,7 +434,7 @@
             <div style="font-size:13px; color:#333; margin-bottom:6px;">📍 <b>Note:</b> ${order.address}</div>
             <div style="margin-bottom:8px; background:#fff; padding:8px; border-radius:6px; border:1px solid #ffe082;">
               ${itemsHtml}
-              <div style="margin-top:6px; font-weight:bold; color:#2e7d32; font-size:13px; text-align:right;">Total: Rs.${grandTotal}</div>
+              <div style="margin-top:6px; font-weight:bold; color:#2e7d32; font-size:13px; text-align:right;">Grand Total (Incl. GST): Rs.${grandTotal}</div>
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn" style="background:#25D366; font-size:12px; padding:7px;" onclick="sendQuotationToCustomer(${order.id})">📲 Send Return Quotation to Customer</button>
@@ -416,14 +447,17 @@
       body.innerHTML = html;
     }
 
-    // Send Priced Quotation directly to Customer's WhatsApp from Dashboard
+    // Clean & Simple Quotation sent to Customer's WhatsApp (Inclusive of all taxes / GST)
     function sendQuotationToCustomer(orderId) {
       const order = savedOrders.find(o => o.id === orderId);
       if(!order) return;
 
-      let msg = "🛒 *Quotation Reply - Secure Electro Controls*\n\n";
-      msg += "👤 *Dear Customer (" + order.name + "),*\n";
-      msg += "Here is your requested quotation breakdown:\n\n";
+      let msg = "🛒 *QUOTATION - SECURE ELECTRO CONTROLS*\n";
+      msg += "📍 *Sirsi (581401) | Ph: 7892369689*\n";
+      msg += "-----------------------------------\n";
+      msg += "👤 *Customer Name:* " + order.name + "\n";
+      msg += "📞 *Mobile Number:* " + order.phone + "\n";
+      msg += "🕒 *Date:* " + order.time + "\n";
       msg += "-----------------------------------\n";
       msg += "*Priced Items List:*\n";
 
@@ -431,12 +465,13 @@
       order.items.forEach((item, index) => {
         let itemTotal = item.price * item.qty;
         grandTotal += itemTotal;
-        msg += (index + 1) + ". " + item.name + "\n   - Rate: Rs." + item.price + " x " + item.qty + " = Rs." + itemTotal + "\n";
+        msg += (index + 1) + ". " + item.name + "\n";
+        msg += "   - Qty: " + item.qty + " x Rs." + item.price + " = Rs." + itemTotal + "\n";
       });
 
       msg += "-----------------------------------\n";
-      msg += "💰 *Total Quotation Amount: Rs." + grandTotal + "*\n\n";
-      msg += "Note: " + order.address + "\n\n";
+      msg += "💰 *Grand Total: Rs." + grandTotal + "/-* \n";
+      msg += "*(Inclusive of all taxes / With GST)*\n\n";
       msg += "Thank you for choosing Secure Electro Controls!";
 
       const url = "https://wa.me/" + order.phone + "?text=" + encodeURIComponent(msg);
@@ -447,7 +482,6 @@
       if(confirm("Are you sure you want to delete this order?")) {
         savedOrders = savedOrders.filter(o => o.id !== orderId);
         localStorage.setItem('secure_shop_orders', JSON.stringify(savedOrders));
-        updateOrderBadge();
         renderOrdersContent();
         showToast("🗑️ Order Deleted");
       }

@@ -44,11 +44,11 @@
     .btn { background: #1976d2; color: white; border: none; padding: 9px 10px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 13px; font-weight: 600; transition: 0.2s; }
     .btn:hover { background: #115293; }
     
-    .btn-whatsapp { background: #25D366; color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-whatsapp { background: #25D366; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
     .btn-whatsapp:hover { background: #20ba5a; }
 
-    .btn-admin-send { background: #e65100; color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
-    .btn-admin-send:hover { background: #ef6c00; }
+    .btn-return-quote { background: #e65100; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
+    .btn-return-quote:hover { background: #ef6c00; }
 
     /* Modal Styling */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: flex-end; z-index: 1000; backdrop-filter: blur(2px); }
@@ -64,9 +64,6 @@
     .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px; }
     .qty-controls { display: flex; align-items: center; gap: 6px; }
     .qty-btn { background: #e0e0e0; border: none; width: 26px; height: 26px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-
-    /* Admin Logout Floating Button (Only visible to you when logged in) */
-    #adminFloatingBar { position: fixed; bottom: 15px; right: 15px; background: #37474f; color: white; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 2500; display: none; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; }
 
     /* Image Zoom Lightbox Styles */
     .img-zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); }
@@ -84,9 +81,6 @@
 <body>
 
   <div id="toast">✅ Added to list successfully!</div>
-
-  <!-- Admin Active Floating Bar (Only appears for Admin) -->
-  <div id="adminFloatingBar" onclick="logoutAdmin()">🔒 Admin Mode (Click to Logout)</div>
 
   <header>
     <div class="brand-title">
@@ -140,11 +134,11 @@
           <textarea id="custAddress" placeholder="Delivery Location / Note *" rows="2" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; resize:none; outline: none;" required></textarea>
         </div>
         
-        <!-- Normal Customer Send Button (No Price) -->
-        <button class="btn-whatsapp" id="customerSendBtn" onclick="sendCustomerRequirement()">Send Requirement to Shop 💬</button>
+        <!-- Button 1: Customer sends requirement to your WhatsApp (No Price) -->
+        <button class="btn-whatsapp" onclick="sendCustomerRequirement()">1. Send Requirement to Shop 💬</button>
         
-        <!-- Admin Approve & Send Priced Quotation Button (Hidden by default) -->
-        <button class="btn-admin-send" id="adminSendBtn" style="display:none;" onclick="sendAdminApprovedQuotation()">✅ Approve & Send Quotation to Customer 💬</button>
+        <!-- Button 2: You click this right after to send priced quotation back to Customer's WhatsApp -->
+        <button class="btn-return-quote" onclick="sendReturnQuotationToCustomer()">2. Send Return Quotation to Customer 📲</button>
       </div>
     </div>
   </div>
@@ -164,25 +158,8 @@
     const defaultPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%230d47a1' stroke-width='1.5'><rect x='2' y='6' width='20' height='12' rx='2'/><circle cx='8' cy='12' r='2'/><circle cx='16' cy='12' r='2'/></svg>";
     let products = [];
     let cart = {};
-    let isAdmin = false;
 
     window.addEventListener('DOMContentLoaded', () => {
-      // 1. Check Secret Key / URL Parameter or Local Storage
-      const urlParams = new URLSearchParams(window.location.search);
-      const secretKey = urlParams.get('admin');
-
-      if (secretKey === 'nataraj_sec99') { // ನಿಮ್ಮ ರಹಸ್ಯ ಕೀ (Secret Key)
-        localStorage.setItem('secure_admin_active', 'true');
-        isAdmin = true;
-      } else if (localStorage.getItem('secure_admin_active') === 'true') {
-        isAdmin = true;
-      }
-
-      if (isAdmin) {
-        document.getElementById('adminFloatingBar').style.display = 'block';
-      }
-
-      // 2. Load Products
       fetch('products.json')
         .then(res => res.json())
         .then(data => {
@@ -195,16 +172,6 @@
         });
       updateBadge();
     });
-
-    function logoutAdmin() {
-      localStorage.removeItem('secure_admin_active');
-      isAdmin = false;
-      document.getElementById('adminFloatingBar').style.display = 'none';
-      showToast("🔒 Logged out from Admin Mode");
-      if(document.getElementById('cartModal').classList.contains('open')) {
-        renderCartContent();
-      }
-    }
 
     function renderProducts() {
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -299,8 +266,6 @@
     function renderCartContent() {
       const body = document.getElementById('cartModalItems');
       const footer = document.getElementById('cartModalFooter');
-      const custSendBtn = document.getElementById('customerSendBtn');
-      const adminSendBtn = document.getElementById('adminSendBtn');
       const keys = Object.keys(cart);
 
       if(keys.length === 0) {
@@ -329,17 +294,9 @@
 
       body.innerHTML = html;
       footer.style.display = 'block';
-
-      // Switch buttons based on Secure Admin Status
-      if (isAdmin) {
-        custSendBtn.style.display = 'none';
-        adminSendBtn.style.display = 'flex';
-      } else {
-        custSendBtn.style.display = 'flex';
-        adminSendBtn.style.display = 'none';
-      }
     }
 
+    // 1. ಕಸ್ಟಮರ್ ಆರ್ಡರ್ ಮಾಡಿದಾಗ ನಿಮ್ಮ ಶಾಪ್‌ಗೆ ಬರುವ ಮೆಸೇಜ್ (ಪ್ರೈಸ್ ಇರುವುದಿಲ್ಲ)
     function sendCustomerRequirement() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
@@ -367,12 +324,13 @@
       msg += "\n-----------------------------------\n";
       msg += "Please send the best quotation price.";
 
-      const shopPhone = "917892369689"; 
+      const shopPhone = "917892369689"; // ನಿಮ್ಮ ಶಾಪ್ ನಂಬರ್
       const url = "https://wa.me/" + shopPhone + "?text=" + encodeURIComponent(msg);
       window.open(url, '_blank');
     }
 
-    function sendAdminApprovedQuotation() {
+    // 2. ಕಸ್ಟಮರ್‌ಗೆ ಪ್ರೈಸ್ ಸೇರಿ ರಿಟರ್ನ್ ಬಿಲ್ ಕಳುಹಿಸುವ ಬಟನ್ (ಇದು ನೇರವಾಗಿ ಕಸ್ಟಮರ್ ನಂಬರ್‌ಗೆ ಹೋಗುತ್ತದೆ)
+    function sendReturnQuotationToCustomer() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
       const address = document.getElementById('custAddress').value.trim();
@@ -382,7 +340,7 @@
         return;
       }
 
-      let msg = "🛒 *Quotation Approved - Secure Electro Controls*\n\n";
+      let msg = "🛒 *Quotation Reply - Secure Electro Controls*\n\n";
       msg += "👤 *Dear Customer (" + name + "),*\n";
       msg += "Here is your requested quotation breakdown:\n\n";
       msg += "-----------------------------------\n";
@@ -404,6 +362,7 @@
       msg += "Note: " + (address || "Standard Delivery") + "\n\n";
       msg += "Thank you for choosing Secure Electro Controls!";
 
+      // ಇದು ನೇರವಾಗಿ ಕಸ್ಟಮರ್ ನಂಬರ್‌ಗೆ (WhatsApp) ಓಪನ್ ಆಗುತ್ತದೆ
       const url = "https://wa.me/" + phone + "?text=" + encodeURIComponent(msg);
       window.open(url, '_blank');
     }

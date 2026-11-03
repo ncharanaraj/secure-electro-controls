@@ -170,8 +170,8 @@
 
   <script>
     // ⚠️ ನಿಮ್ಮ JSONBin Details ಅನ್ನು ಇಲ್ಲಿ ಹಾಕಿ
-    const BIN_ID = "6ae9c1b2ac6210605a68760c";
-    const MASTER_KEY = "$2a$10$6XiRSIncaLwwkUOgVP.QFuGXV8cijDYq8amCJi/pVgZ.5QlSuIup6";
+    const BIN_ID = "YOUR_BIN_ID_HERE";
+    const MASTER_KEY = "YOUR_JSONBIN_MASTER_KEY_HERE";
 
     const defaultPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%230d47a1' stroke-width='1.5'><rect x='2' y='6' width='20' height='12' rx='2'/><circle cx='8' cy='12' r='2'/><circle cx='16' cy='12' r='2'/></svg>";
     let products = [];
@@ -348,7 +348,7 @@
       footer.style.display = 'block';
     }
 
-    // Submit Order to Cloud JSONBin & WhatsApp
+    // Submit Order to Cloud JSONBin & WhatsApp WITHOUT showing price to customer initially
     async function submitOrderToCloudBin() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
@@ -403,6 +403,7 @@
         console.error('Cloud Sync Error:', err);
       }
 
+      // WhatsApp message to shop owner (WITHOUT price shown to customer before sending)
       let msg = "📋 *NEW REQUIREMENT INQUIRY*\n";
       msg += "🏢 *Secure Electro Controls*\n";
       msg += "-----------------------------------\n";
@@ -413,13 +414,11 @@
       msg += "*Required Items List:*\n";
 
       orderItems.forEach((item, index) => {
-        let itemTotal = (item.price || 0) * item.qty;
-        msg += (index + 1) + ". " + item.name + " - Qty: " + item.qty + " (Rate: ₹" + (item.price || 0) + " = ₹" + itemTotal + ")\n";
+        msg += (index + 1) + ". " + item.name + " - Qty: " + item.qty + "\n";
       });
 
       msg += "-----------------------------------\n";
-      msg += "💰 *Estimated Total:* ₹" + grandTotal + "/- (Incl. GST)\n";
-      msg += "Please confirm and send quotation.";
+      msg += "Please check admin dashboard and send quotation.";
 
       const shopPhone = "917892369689";
       const url = "https://wa.me/" + shopPhone + "?text=" + encodeURIComponent(msg);
@@ -428,7 +427,7 @@
       cart = {};
       updateBadge();
       toggleCartModal();
-      showToast("✅ Order Saved to Cloud & Sent!");
+      showToast("✅ Requirement Sent to Shop!");
     }
 
     // Fetch live orders from JSONBin when Admin logs in
@@ -452,7 +451,7 @@
         let html = '';
         orders.forEach((order) => {
           html += `
-            <div class="order-card-box">
+            <div class="order-card-box" id="order-${order.id}">
               <div style="display:flex; justify-content:space-between; font-weight:bold; color:#0d47a1; margin-bottom:6px; font-size:14px;">
                 <span>👤 ${order.name} (${order.phone})</span>
                 <span style="font-size:11px; color:#666;">🕒 ${order.time}</span>
@@ -462,7 +461,10 @@
                 <div style="font-size:13px; color:#444;">• ${order.items}</div>
                 <div style="margin-top:6px; font-weight:bold; color:#2e7d32; font-size:13px; text-align:right;">Total: ${order.total} (Incl. GST)</div>
               </div>
-              <button class="btn" style="background:#25D366; font-size:12px; padding:7px;" onclick="sendQuotationToCustomer('${order.phone}', '${order.name}', '${order.items}', '${order.total}')">📲 Send Return Quotation to Customer</button>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn" style="background:#25D366; font-size:12px; padding:7px; flex: 1;" onclick="sendQuotationToCustomer('${order.phone}', '${order.name}', '${order.items}', '${order.total}')">📲 Send Return Quotation to Customer</button>
+                <button class="btn" style="background:#d32f2f; font-size:12px; padding:7px; width: auto;" onclick="deleteCloudOrder(${order.id})">❌ Delete</button>
+              </div>
             </div>
           `;
         });
@@ -470,6 +472,38 @@
       } catch (err) {
         console.error('Error fetching orders:', err);
         body.innerHTML = '<p style="color:red; text-align:center; margin-top:50px;">Failed to load orders from cloud. Check API Key and Bin ID.</p>';
+      }
+    }
+
+    // Delete Order from Cloud JSONBin
+    async function deleteCloudOrder(orderId) {
+      if(!confirm("Are you sure you want to delete this order?")) return;
+
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+          headers: { 'X-Master-Key': MASTER_KEY }
+        });
+        const data = await res.json();
+        let orders = data.record || [];
+
+        // Filter out the deleted order
+        orders = orders.filter(o => o.id !== orderId);
+
+        // Update JSONBin
+        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': MASTER_KEY
+          },
+          body: JSON.stringify(orders)
+        });
+
+        showToast("🗑️ Order Deleted Successfully!");
+        fetchCloudOrders(); // Refresh orders list
+      } catch (err) {
+        console.error('Delete Error:', err);
+        alert("Failed to delete order from cloud.");
       }
     }
 

@@ -177,6 +177,8 @@
     let footerTimer = null;
 
     window.addEventListener('DOMContentLoaded', () => {
+      // Load orders from localStorage (Note: For multi-device syncing without a server, 
+      // orders sent via WhatsApp come to your chat, but here we also save local test orders).
       const storedOrders = localStorage.getItem('secure_shop_orders');
       if (storedOrders) {
         savedOrders = JSON.parse(storedOrders);
@@ -272,7 +274,8 @@
       if(cart[id]) {
         cart[id].qty += 1;
       } else {
-        cart[id] = { id: item.id, name: item.name, price: item.price, qty: 1 };
+        // Automatically attach price from products.json for backend calculation
+        cart[id] = { id: item.id, name: item.name, price: item.price || 0, qty: 1 };
       }
       updateBadge();
       if(document.getElementById('cartModal').classList.contains('open')) {
@@ -353,7 +356,6 @@
       footer.style.display = 'block';
     }
 
-    // Customer Requirement Text Format (Simple & Clean WhatsApp List)
     function submitOrderToDashboard() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
@@ -381,6 +383,7 @@
       savedOrders.unshift(newOrder);
       localStorage.setItem('secure_shop_orders', JSON.stringify(savedOrders));
 
+      // WhatsApp message sent to Shop owner containing customer request
       let msg = "📋 *NEW REQUIREMENT INQUIRY*\n";
       msg += "🏢 *Secure Electro Controls*\n";
       msg += "-----------------------------------\n";
@@ -395,7 +398,7 @@
       });
 
       msg += "-----------------------------------\n";
-      msg += "⚡ *Status:* Saved to Dashboard. Please send quotation.";
+      msg += "Please send the quotation price.";
 
       const shopPhone = "917892369689";
       const url = "https://wa.me/" + shopPhone + "?text=" + encodeURIComponent(msg);
@@ -410,7 +413,7 @@
     function renderOrdersContent() {
       const body = document.getElementById('ordersListBody');
       if (savedOrders.length === 0) {
-        body.innerHTML = '<p style="color:#777; text-align:center; margin-top:50px;">No new orders received yet.</p>';
+        body.innerHTML = '<p style="color:#777; text-align:center; margin-top:50px;">No orders in local storage. (Note: When customers order from other phones, their inquiry comes directly to your WhatsApp chat)</p>';
         return;
       }
 
@@ -420,9 +423,9 @@
         let grandTotal = 0;
 
         order.items.forEach((item, index) => {
-          let itemTotal = item.price * item.qty;
+          let itemTotal = (item.price || 0) * item.qty;
           grandTotal += itemTotal;
-          itemsHtml += `<div style="font-size:13px; color:#444; margin-left:10px;">• ${index + 1}. ${item.name} (Qty: ${item.qty}) - Rate: Rs.${item.price} = Rs.${itemTotal}</div>`;
+          itemsHtml += `<div style="font-size:13px; color:#444; margin-left:10px;">• ${index + 1}. ${item.name} (Qty: ${item.qty}) - Rate: Rs.${item.price || 0} = Rs.${itemTotal}</div>`;
         });
 
         html += `
@@ -447,7 +450,7 @@
       body.innerHTML = html;
     }
 
-    // Clean & Simple Quotation sent to Customer's WhatsApp (Inclusive of all taxes / GST)
+    // AUTOMATIC QUOTATION SENDER: Automatically calculates prices from products.json and formats text bill for Customer WhatsApp
     function sendQuotationToCustomer(orderId) {
       const order = savedOrders.find(o => o.id === orderId);
       if(!order) return;
@@ -463,10 +466,11 @@
 
       let grandTotal = 0;
       order.items.forEach((item, index) => {
-        let itemTotal = item.price * item.qty;
+        let itemPrice = item.price || 0;
+        let itemTotal = itemPrice * item.qty;
         grandTotal += itemTotal;
         msg += (index + 1) + ". " + item.name + "\n";
-        msg += "   - Qty: " + item.qty + " x Rs." + item.price + " = Rs." + itemTotal + "\n";
+        msg += "   - Qty: " + item.qty + " x Rs." + itemPrice + " = Rs." + itemTotal + "\n";
       });
 
       msg += "-----------------------------------\n";
@@ -474,6 +478,7 @@
       msg += "*(Inclusive of all taxes / With GST)*\n\n";
       msg += "Thank you for choosing Secure Electro Controls!";
 
+      // Automatically opens WhatsApp chat with the customer's phone number and the fully priced quote!
       const url = "https://wa.me/" + order.phone + "?text=" + encodeURIComponent(msg);
       window.open(url, '_blank');
     }

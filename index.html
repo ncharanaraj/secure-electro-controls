@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Electro Controls - Catalog & Quotation</title>
+  <title>Secure Electro Controls - Catalog & Orders</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { margin: 0; background-color: #f4f6f9; color: #333; padding-bottom: 90px; }
@@ -12,9 +12,11 @@
     header .brand-title h1 { margin: 0; font-size: 18px; font-weight: 700; }
     header .brand-title p { margin: 3px 0 0; font-size: 11px; opacity: 0.9; }
     
-    .action-btn { background: #ff9800; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .header-btns { display: flex; gap: 8px; }
+    .action-btn { background: #ff9800; color: #fff; border: none; padding: 8px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     .action-btn:hover { background: #f57c00; }
-    .badge-count { background: #d32f2f; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; }
+    .orders-btn { background: #d32f2f; }
+    .badge-count { background: #fff; color: #d32f2f; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold; }
 
     .container { max-width: 1100px; margin: 20px auto; padding: 0 12px; }
     .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -27,15 +29,9 @@
     }
     
     .card { background: white; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.06); padding: 12px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #eaeaea; }
-    
-    .img-container { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; background: #fafafa; border-radius: 8px; overflow: hidden; margin-bottom: 8px; cursor: pointer; position: relative; }
+    .img-container { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; background: #fafafa; border-radius: 8px; overflow: hidden; margin-bottom: 8px; cursor: pointer; }
     .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s ease; }
     .img-container:hover img { transform: scale(1.05); }
-    
-    @media (min-width: 768px) {
-      .img-container { height: 160px; }
-      .card { padding: 15px; }
-    }
     
     .card h3 { font-size: 13px; margin: 6px 0; color: #1a237e; min-height: 35px; line-height: 1.3; font-weight: 600; }
     .card .category-tag { font-size: 10px; color: #555; background: #e8eaf6; padding: 3px 8px; border-radius: 4px; width: fit-content; margin-bottom: 6px; font-weight: 500; }
@@ -43,19 +39,12 @@
     
     .btn { background: #1976d2; color: white; border: none; padding: 9px 10px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 13px; font-weight: 600; transition: 0.2s; }
     .btn:hover { background: #115293; }
-    
     .btn-whatsapp { background: #25D366; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
-    .btn-whatsapp:hover { background: #20ba5a; }
-
-    .btn-return-quote { background: #e65100; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
-    .btn-return-quote:hover { background: #ef6c00; }
 
     /* Modal Styling */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: flex-end; z-index: 1000; backdrop-filter: blur(2px); }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: flex-end; z-index: 1000; }
     .modal-overlay.open { display: flex; }
-    .modal-content { background: white; width: 100%; max-width: 420px; height: 100%; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
-    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
+    .modal-content { background: white; width: 100%; max-width: 420px; height: 100%; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); }
     .modal-header { background: #0d47a1; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
     .close-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
     .modal-body { padding: 15px 20px; flex: 1; overflow-y: auto; }
@@ -65,14 +54,18 @@
     .qty-controls { display: flex; align-items: center; gap: 6px; }
     .qty-btn { background: #e0e0e0; border: none; width: 26px; height: 26px; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
-    /* Image Zoom Lightbox Styles */
-    .img-zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); }
-    .img-zoom-modal.open { display: flex; }
-    .img-zoom-content { max-width: 90%; max-height: 80vh; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); object-fit: contain; background: white; padding: 10px; }
-    .img-zoom-caption { position: absolute; bottom: 30px; color: white; font-size: 16px; font-weight: 600; text-align: center; background: rgba(0,0,0,0.6); padding: 8px 18px; border-radius: 20px; }
-    .close-zoom-btn { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; font-weight: bold; }
+    /* Orders Dashboard Modal Styling */
+    .orders-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; }
+    .orders-modal.open { display: flex; }
+    .orders-container { background: white; width: 95%; max-width: 650px; height: 85vh; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+    .order-card-box { background: #fffde7; border: 1px solid #ffe082; padding: 14px; border-radius: 8px; margin-bottom: 12px; }
 
-    #toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2e7d32; color: white; padding: 10px 22px; border-radius: 30px; font-size: 14px; transition: 0.3s; opacity: 0; z-index: 4000; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    /* Image Zoom Lightbox Styles */
+    .img-zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 3000; }
+    .img-zoom-modal.open { display: flex; }
+    .img-zoom-content { max-width: 90%; max-height: 80vh; border-radius: 8px; background: white; padding: 10px; }
+
+    #toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2e7d32; color: white; padding: 10px 22px; border-radius: 30px; font-size: 14px; transition: 0.3s; opacity: 0; z-index: 4000; font-weight: 600; }
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
     footer { text-align: center; padding: 18px; font-size: 12px; color: #666; background: #fff; border-top: 1px solid #eee; margin-top: 40px; }
@@ -80,16 +73,21 @@
 </head>
 <body>
 
-  <div id="toast">✅ Added to list successfully!</div>
+  <div id="toast">✅ Order Saved Successfully!</div>
 
   <header>
     <div class="brand-title">
       <h1>Secure Electro Controls</h1>
       <p>Smart Electricals & Automation | Sirsi (581340)</p>
     </div>
-    <button class="action-btn" onclick="toggleCartModal()">
-      📋 List <span class="badge-count" id="headerCount">0</span>
-    </button>
+    <div class="header-btns">
+      <button class="action-btn orders-btn" onclick="toggleOrdersModal()">
+        📥 Orders <span class="badge-count" id="orderBadge">0</span>
+      </button>
+      <button class="action-btn" onclick="toggleCartModal()">
+        📋 List <span class="badge-count" id="headerCount">0</span>
+      </button>
+    </div>
   </header>
 
   <div class="container">
@@ -117,11 +115,11 @@
     <div class="product-grid" id="productGrid"></div>
   </div>
 
-  <!-- Cart / Request Modal -->
+  <!-- Cart Modal -->
   <div class="modal-overlay" id="cartModal" onclick="handleOverlayClick(event)">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 style="font-size:16px; margin:0;" id="modalTitle">📋 Selected Requirement List</h2>
+        <h2 style="font-size:16px; margin:0;">📋 Selected Requirement List</h2>
         <button class="close-btn" onclick="toggleCartModal()">&times;</button>
       </div>
       <div class="modal-body" id="cartModalItems">
@@ -129,25 +127,32 @@
       </div>
       <div class="modal-footer" id="cartModalFooter" style="display:none;">
         <div style="margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px;">
-          <input type="text" id="custName" placeholder="Customer / Business Name *" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none;" required>
-          <input type="text" id="custPhone" placeholder="Customer Mobile Number (e.g. 919876543210) *" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none;" required>
+          <input type="text" id="custName" placeholder="Customer Name *" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none;" required>
+          <input type="text" id="custPhone" placeholder="Mobile Number (e.g. 919876543210) *" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none;" required>
           <textarea id="custAddress" placeholder="Delivery Location / Note *" rows="2" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; resize:none; outline: none;" required></textarea>
         </div>
-        
-        <!-- Button 1: Customer sends requirement to your WhatsApp (No Price) -->
-        <button class="btn-whatsapp" onclick="sendCustomerRequirement()">1. Send Requirement to Shop 💬</button>
-        
-        <!-- Button 2: You click this right after to send priced quotation back to Customer's WhatsApp -->
-        <button class="btn-return-quote" onclick="sendReturnQuotationToCustomer()">2. Send Return Quotation to Customer 📲</button>
+        <button class="btn-whatsapp" onclick="submitOrderToDashboard()">Send Requirement to Shop 💬</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Orders Dashboard Modal -->
+  <div class="orders-modal" id="ordersModal" onclick="handleOrdersOverlay(event)">
+    <div class="orders-container">
+      <div class="modal-header">
+        <h2 style="font-size:16px; margin:0;">📥 Customer Orders Dashboard</h2>
+        <button class="close-btn" onclick="toggleOrdersModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="ordersListBody" style="background: #f9f9f9;">
+        <!-- Orders will load here dynamically -->
       </div>
     </div>
   </div>
 
   <!-- Image Zoom Lightbox Modal -->
   <div class="img-zoom-modal" id="imgZoomModal" onclick="closeImageZoom()">
-    <span class="close-zoom-btn">&times;</span>
-    <img class="img-zoom-content" id="zoomedImage" src="" alt="Zoomed Product">
-    <div class="img-zoom-caption" id="zoomedCaption"></div>
+    <span style="position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer;">&times;</span>
+    <img class="img-zoom-content" id="zoomedImage" src="" alt="Zoom">
   </div>
 
   <footer>
@@ -158,8 +163,16 @@
     const defaultPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%230d47a1' stroke-width='1.5'><rect x='2' y='6' width='20' height='12' rx='2'/><circle cx='8' cy='12' r='2'/><circle cx='16' cy='12' r='2'/></svg>";
     let products = [];
     let cart = {};
+    let savedOrders = [];
 
     window.addEventListener('DOMContentLoaded', () => {
+      // Load saved orders from browser storage
+      const storedOrders = localStorage.getItem('secure_shop_orders');
+      if (storedOrders) {
+        savedOrders = JSON.parse(storedOrders);
+      }
+      updateOrderBadge();
+
       fetch('products.json')
         .then(res => res.json())
         .then(data => {
@@ -195,7 +208,7 @@
         grid.innerHTML += `
           <div class="card">
             <span class="category-tag">${prod.category || 'General'}</span>
-            <div class="img-container" onclick="openImageZoom('${imgSrc}', '${prod.name.replace(/'/g, "\\'")}')">
+            <div class="img-container" onclick="openImageZoom('${imgSrc}')">
               <img src="${imgSrc}" alt="${prod.name}" onerror="this.src='${defaultPlaceholder}'">
             </div>
             <h3>${prod.name}</h3>
@@ -206,14 +219,9 @@
       });
     }
 
-    function openImageZoom(imgSrc, name) {
-      const modal = document.getElementById('imgZoomModal');
-      const zoomedImg = document.getElementById('zoomedImage');
-      const caption = document.getElementById('zoomedCaption');
-      
-      zoomedImg.src = imgSrc;
-      caption.innerText = name;
-      modal.classList.add('open');
+    function openImageZoom(src) {
+      document.getElementById('zoomedImage').src = src;
+      document.getElementById('imgZoomModal').classList.add('open');
     }
 
     function closeImageZoom() {
@@ -223,7 +231,6 @@
     function addToCart(id) {
       const item = products.find(p => p.id === id);
       if(!item) return;
-      
       if(cart[id]) {
         cart[id].qty += 1;
       } else {
@@ -251,6 +258,10 @@
       document.getElementById('headerCount').innerText = total;
     }
 
+    function updateOrderBadge() {
+      document.getElementById('orderBadge').innerText = savedOrders.length;
+    }
+
     function toggleCartModal() {
       const modal = document.getElementById('cartModal');
       modal.classList.toggle('open');
@@ -259,8 +270,20 @@
       }
     }
 
+    function toggleOrdersModal() {
+      const modal = document.getElementById('ordersModal');
+      modal.classList.toggle('open');
+      if(modal.classList.contains('open')) {
+        renderOrdersContent();
+      }
+    }
+
     function handleOverlayClick(e) {
       if(e.target.id === 'cartModal') toggleCartModal();
+    }
+
+    function handleOrdersOverlay(e) {
+      if(e.target.id === 'ordersModal') toggleOrdersModal();
     }
 
     function renderCartContent() {
@@ -296,8 +319,8 @@
       footer.style.display = 'block';
     }
 
-    // 1. ಕಸ್ಟಮರ್ ಆರ್ಡರ್ ಮಾಡಿದಾಗ ನಿಮ್ಮ ಶಾಪ್‌ಗೆ ಬರುವ ಮೆಸೇಜ್ (ಪ್ರೈಸ್ ಇರುವುದಿಲ್ಲ)
-    function sendCustomerRequirement() {
+    // Customer submits order -> Saved to local storage & WhatsApp opens for Shop owner
+    function submitOrderToDashboard() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
       const address = document.getElementById('custAddress').value.trim();
@@ -307,6 +330,26 @@
         return;
       }
 
+      let orderItems = [];
+      Object.keys(cart).forEach(k => {
+        orderItems.push(cart[k]);
+      });
+
+      const newOrder = {
+        id: Date.now(),
+        time: new Date().toLocaleString(),
+        name: name,
+        phone: phone,
+        address: address,
+        items: orderItems
+      };
+
+      // Save order permanently in browser storage
+      savedOrders.unshift(newOrder); // Add to top
+      localStorage.setItem('secure_shop_orders', JSON.stringify(savedOrders));
+      updateOrderBadge();
+
+      // Open WhatsApp for Shop Owner
       let msg = "📋 *New Requirement Inquiry - Secure Electro Controls*\n\n";
       msg += "👤 *Customer Name:* " + name + "\n";
       msg += "📞 *Mobile Number:* " + phone + "\n";
@@ -314,57 +357,100 @@
       msg += "-----------------------------------\n";
       msg += "*Required Items List:*\n";
 
-      let count = 1;
-      Object.keys(cart).forEach(k => {
-        let item = cart[k];
-        msg += count + ". " + item.name + " - Qty: " + item.qty + "\n";
-        count++;
+      orderItems.forEach((item, index) => {
+        msg += (index + 1) + ". " + item.name + " - Qty: " + item.qty + "\n";
       });
 
       msg += "\n-----------------------------------\n";
-      msg += "Please send the best quotation price.";
+      msg += "Saved to Orders Dashboard. Send quotation.";
 
-      const shopPhone = "917892369689"; // ನಿಮ್ಮ ಶಾಪ್ ನಂಬರ್
+      const shopPhone = "917892369689";
       const url = "https://wa.me/" + shopPhone + "?text=" + encodeURIComponent(msg);
       window.open(url, '_blank');
+
+      // Reset Cart
+      cart = {};
+      updateBadge();
+      toggleCartModal();
+      showToast("✅ Order Saved & Sent!");
     }
 
-    // 2. ಕಸ್ಟಮರ್‌ಗೆ ಪ್ರೈಸ್ ಸೇರಿ ರಿಟರ್ನ್ ಬಿಲ್ ಕಳುಹಿಸುವ ಬಟನ್ (ಇದು ನೇರವಾಗಿ ಕಸ್ಟಮರ್ ನಂಬರ್‌ಗೆ ಹೋಗುತ್ತದೆ)
-    function sendReturnQuotationToCustomer() {
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
-      const address = document.getElementById('custAddress').value.trim();
-
-      if(!name || !phone) {
-        alert("Please enter Customer Name and Mobile Number!");
+    // Render Orders in Dashboard
+    function renderOrdersContent() {
+      const body = document.getElementById('ordersListBody');
+      if (savedOrders.length === 0) {
+        body.innerHTML = '<p style="color:#777; text-align:center; margin-top:50px;">No new orders received yet.</p>';
         return;
       }
 
+      let html = '';
+      savedOrders.forEach((order, index) => {
+        let itemsHtml = '';
+        let grandTotal = 0;
+
+        order.items.forEach((item, i) => {
+          let itemTotal = item.price * item.qty;
+          grandTotal += itemTotal;
+          itemsHtml += `<div style="font-size:13px; color:#444; margin-left:10px;">• ${item.name} (Qty: ${item.qty}) - Rate: Rs.${item.price} = Rs.${itemTotal}</div>`;
+        });
+
+        html += `
+          <div class="order-card-box">
+            <div style="display:flex; justify-content:space-between; font-weight:bold; color:#0d47a1; margin-bottom:6px; font-size:14px;">
+              <span>👤 ${order.name} (${order.phone})</span>
+              <span style="font-size:11px; color:#666;">🕒 ${order.time}</span>
+            </div>
+            <div style="font-size:13px; color:#333; margin-bottom:6px;">📍 <b>Note:</b> ${order.address}</div>
+            <div style="margin-bottom:8px; background:#fff; padding:8px; border-radius:6px; border:1px solid #ffe082;">
+              ${itemsHtml}
+              <div style="margin-top:6px; font-weight:bold; color:#2e7d32; font-size:13px; text-align:right;">Total: Rs.${grandTotal}</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn" style="background:#25D366; font-size:12px; padding:7px;" onclick="sendQuotationToCustomer(${order.id})">📲 Send Return Quotation to Customer</button>
+              <button class="btn" style="background:#d32f2f; font-size:12px; padding:7px; width:auto;" onclick="deleteOrder(${order.id})">❌ Delete</button>
+            </div>
+          </div>
+        `;
+      });
+
+      body.innerHTML = html;
+    }
+
+    // Send Priced Quotation directly to Customer's WhatsApp from Dashboard
+    function sendQuotationToCustomer(orderId) {
+      const order = savedOrders.find(o => o.id === orderId);
+      if(!order) return;
+
       let msg = "🛒 *Quotation Reply - Secure Electro Controls*\n\n";
-      msg += "👤 *Dear Customer (" + name + "),*\n";
+      msg += "👤 *Dear Customer (" + order.name + "),*\n";
       msg += "Here is your requested quotation breakdown:\n\n";
       msg += "-----------------------------------\n";
       msg += "*Priced Items List:*\n";
 
       let grandTotal = 0;
-      let count = 1;
-
-      Object.keys(cart).forEach(k => {
-        let item = cart[k];
+      order.items.forEach((item, index) => {
         let itemTotal = item.price * item.qty;
         grandTotal += itemTotal;
-        msg += count + ". " + item.name + "\n   - Rate: Rs." + item.price + " x " + item.qty + " = Rs." + itemTotal + "\n";
-        count++;
+        msg += (index + 1) + ". " + item.name + "\n   - Rate: Rs." + item.price + " x " + item.qty + " = Rs." + itemTotal + "\n";
       });
 
       msg += "-----------------------------------\n";
       msg += "💰 *Total Quotation Amount: Rs." + grandTotal + "*\n\n";
-      msg += "Note: " + (address || "Standard Delivery") + "\n\n";
+      msg += "Note: " + order.address + "\n\n";
       msg += "Thank you for choosing Secure Electro Controls!";
 
-      // ಇದು ನೇರವಾಗಿ ಕಸ್ಟಮರ್ ನಂಬರ್‌ಗೆ (WhatsApp) ಓಪನ್ ಆಗುತ್ತದೆ
-      const url = "https://wa.me/" + phone + "?text=" + encodeURIComponent(msg);
+      const url = "https://wa.me/" + order.phone + "?text=" + encodeURIComponent(msg);
       window.open(url, '_blank');
+    }
+
+    function deleteOrder(orderId) {
+      if(confirm("Are you sure you want to delete this order?")) {
+        savedOrders = savedOrders.filter(o => o.id !== orderId);
+        localStorage.setItem('secure_shop_orders', JSON.stringify(savedOrders));
+        updateOrderBadge();
+        renderOrdersContent();
+        showToast("🗑️ Order Deleted");
+      }
     }
 
     function showToast(txt) {

@@ -52,6 +52,17 @@
     .qty-controls { display: flex; align-items: center; gap: 6px; }
     .qty-btn { background: #e0e0e0; border: none; width: 26px; height: 26px; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
+    /* Secret Password Modal */
+    .admin-password-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 3000; }
+    .admin-password-modal.open { display: flex; }
+    .admin-pwd-box { background: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+
+    /* Admin Orders Dashboard Modal */
+    .orders-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; }
+    .orders-modal.open { display: flex; }
+    .orders-container { background: white; width: 95%; max-width: 650px; height: 85vh; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+    .order-card-box { background: #fffde7; border: 1px solid #ffe082; padding: 14px; border-radius: 8px; margin-bottom: 12px; }
+
     /* Image Zoom Lightbox Styles */
     .img-zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 3000; }
     .img-zoom-modal.open { display: flex; }
@@ -65,7 +76,7 @@
 </head>
 <body>
 
-  <div id="toast">✅ Requirement sent successfully!</div>
+  <div id="toast">✅ Order Saved Successfully!</div>
 
   <header>
     <div class="brand-title">
@@ -118,7 +129,30 @@
           <input type="text" id="custPhone" placeholder="Mobile Number (e.g. 919876543210) *" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none;" required>
           <textarea id="custAddress" placeholder="Delivery Location / Note *" rows="2" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; resize:none; outline: none;" required></textarea>
         </div>
-        <button class="btn-whatsapp" onclick="sendRequirementToShopWhatsApp()">Send Requirement to Shop 💬</button>
+        <button class="btn-whatsapp" onclick="submitOrderToCloudBin()">Send Requirement to Shop 💬</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secret Password Prompt Modal -->
+  <div class="admin-password-modal" id="pwdModal" onclick="handlePwdOverlay(event)">
+    <div class="admin-pwd-box">
+      <h3 style="margin-top:0; color:#0d47a1; font-size:16px;">🔐 Admin Access</h3>
+      <p style="font-size:12px; color:#666; margin-bottom:12px;">Enter Admin Password to view orders.</p>
+      <input type="password" id="adminPasswordInput" placeholder="Enter Password" style="width:100%; padding:9px; border:1px solid #ccc; border-radius:6px; font-size:14px; text-align:center; margin-bottom:12px; outline:none;">
+      <button class="btn" onclick="verifyAdminPassword()">Login</button>
+    </div>
+  </div>
+
+  <!-- Admin Orders Dashboard Modal -->
+  <div class="orders-modal" id="ordersModal" onclick="handleOrdersOverlay(event)">
+    <div class="orders-container">
+      <div class="modal-header" style="background: #37474f;">
+        <h2 style="font-size:16px; margin:0;">🔐 Admin Orders Dashboard (Cloud Sync)</h2>
+        <button class="close-btn" onclick="toggleOrdersModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="ordersListBody" style="background: #f9f9f9;">
+        <p style="text-align:center; color:#777; margin-top:40px;">Loading orders from Cloud...</p>
       </div>
     </div>
   </div>
@@ -129,14 +163,21 @@
     <img class="img-zoom-content" id="zoomedImage" src="" alt="Zoom">
   </div>
 
+  <!-- Footer with Secret Triple-Click Trigger (Password: sec1994) -->
   <footer>
-    <p>© Secure Electro Controls - Call: 7892369689</p>
+    <p onclick="handleFooterTripleClick()">© Secure Electro Controls - Call: 7892369689</p>
   </footer>
 
   <script>
+    // ⚠️ ನಿಮ್ಮ JSONBin Details ಅನ್ನು ಇಲ್ಲಿ ಹಾಕಿ
+    const BIN_ID = "6ae9c1b2ac6210605a68760c";
+    const MASTER_KEY = "$2a$10$6XiRSIncaLwwkUOgVP.QFuGXV8cijDYq8amCJi/pVgZ.5QlSuIup6";
+
     const defaultPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%230d47a1' stroke-width='1.5'><rect x='2' y='6' width='20' height='12' rx='2'/><circle cx='8' cy='12' r='2'/><circle cx='16' cy='12' r='2'/></svg>";
     let products = [];
     let cart = {};
+    let footerClicks = 0;
+    let footerTimer = null;
 
     window.addEventListener('DOMContentLoaded', () => {
       fetch('products.json')
@@ -151,6 +192,35 @@
         });
       updateBadge();
     });
+
+    function handleFooterTripleClick() {
+      footerClicks++;
+      if (footerClicks === 1) {
+        footerTimer = setTimeout(() => { footerClicks = 0; }, 600);
+      } else if (footerClicks === 3) {
+        clearTimeout(footerTimer);
+        footerClicks = 0;
+        document.getElementById('pwdModal').classList.add('open');
+      }
+    }
+
+    function handlePwdOverlay(e) {
+      if(e.target.id === 'pwdModal') {
+        document.getElementById('pwdModal').classList.remove('open');
+        document.getElementById('adminPasswordInput').value = '';
+      }
+    }
+
+    function verifyAdminPassword() {
+      const pwd = document.getElementById('adminPasswordInput').value.trim();
+      if(pwd === 'sec1994') {
+        document.getElementById('pwdModal').classList.remove('open');
+        document.getElementById('adminPasswordInput').value = '';
+        fetchCloudOrders();
+      } else {
+        alert("Incorrect Password!");
+      }
+    }
 
     function renderProducts() {
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -200,7 +270,6 @@
       if(cart[id]) {
         cart[id].qty += 1;
       } else {
-        // Automatically fetch price from products.json for calculation
         cart[id] = { id: item.id, name: item.name, price: item.price || 0, qty: 1 };
       }
       updateBadge();
@@ -233,8 +302,17 @@
       }
     }
 
+    function toggleOrdersModal() {
+      const modal = document.getElementById('ordersModal');
+      modal.classList.toggle('open');
+    }
+
     function handleOverlayClick(e) {
       if(e.target.id === 'cartModal') toggleCartModal();
+    }
+
+    function handleOrdersOverlay(e) {
+      if(e.target.id === 'ordersModal') toggleOrdersModal();
     }
 
     function renderCartContent() {
@@ -270,8 +348,8 @@
       footer.style.display = 'block';
     }
 
-    // Automatically calculates grand total using products.json prices and sends directly to your Shop WhatsApp
-    function sendRequirementToShopWhatsApp() {
+    // Submit Order to Cloud JSONBin & WhatsApp
+    async function submitOrderToCloudBin() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
       const address = document.getElementById('custAddress').value.trim();
@@ -282,9 +360,48 @@
       }
 
       let orderItems = [];
+      let grandTotal = 0;
+      let itemsStr = "";
+
       Object.keys(cart).forEach(k => {
-        orderItems.push(cart[k]);
+        let item = cart[k];
+        let itemTotal = (item.price || 0) * item.qty;
+        grandTotal += itemTotal;
+        orderItems.push(item);
+        itemsStr += `${item.name} (Qty: ${item.qty}), `;
       });
+
+      const newOrder = {
+        id: Date.now(),
+        time: new Date().toLocaleString(),
+        name: name,
+        phone: phone,
+        address: address,
+        items: itemsStr,
+        total: "Rs." + grandTotal
+      };
+
+      try {
+        const getRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+          headers: { 'X-Master-Key': MASTER_KEY }
+        });
+        const getData = await getRes.json();
+        let existingOrders = getData.record || [];
+        if (!Array.isArray(existingOrders)) existingOrders = [];
+
+        existingOrders.unshift(newOrder);
+
+        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': MASTER_KEY
+          },
+          body: JSON.stringify(existingOrders)
+        });
+      } catch (err) {
+        console.error('Cloud Sync Error:', err);
+      }
 
       let msg = "📋 *NEW REQUIREMENT INQUIRY*\n";
       msg += "🏢 *Secure Electro Controls*\n";
@@ -295,25 +412,84 @@
       msg += "-----------------------------------\n";
       msg += "*Required Items List:*\n";
 
-      let grandTotal = 0;
       orderItems.forEach((item, index) => {
         let itemTotal = (item.price || 0) * item.qty;
-        grandTotal += itemTotal;
         msg += (index + 1) + ". " + item.name + " - Qty: " + item.qty + " (Rate: ₹" + (item.price || 0) + " = ₹" + itemTotal + ")\n";
       });
 
       msg += "-----------------------------------\n";
-      msg += "💰 *Grand Total (Incl. GST):* ₹" + grandTotal + "/-\n\n";
+      msg += "💰 *Estimated Total:* ₹" + grandTotal + "/- (Incl. GST)\n";
       msg += "Please confirm and send quotation.";
 
-      const shopPhone = "917892369689"; // ನಿಮ್ಮ ಶಾಪ್ ವಾಟ್ಸಾಪ್ ನಂಬರ್
+      const shopPhone = "917892369689";
       const url = "https://wa.me/" + shopPhone + "?text=" + encodeURIComponent(msg);
       window.open(url, '_blank');
 
       cart = {};
       updateBadge();
       toggleCartModal();
-      showToast("✅ Requirement sent to shop WhatsApp!");
+      showToast("✅ Order Saved to Cloud & Sent!");
+    }
+
+    // Fetch live orders from JSONBin when Admin logs in
+    async function fetchCloudOrders() {
+      toggleOrdersModal();
+      const body = document.getElementById('ordersListBody');
+      body.innerHTML = '<p style="text-align:center; color:#777; margin-top:40px;">Fetching live orders from Cloud...</p>';
+
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+          headers: { 'X-Master-Key': MASTER_KEY }
+        });
+        const data = await res.json();
+        const orders = data.record || [];
+
+        if (orders.length === 0) {
+          body.innerHTML = '<p style="color:#777; text-align:center; margin-top:50px;">No orders found in cloud database.</p>';
+          return;
+        }
+
+        let html = '';
+        orders.forEach((order) => {
+          html += `
+            <div class="order-card-box">
+              <div style="display:flex; justify-content:space-between; font-weight:bold; color:#0d47a1; margin-bottom:6px; font-size:14px;">
+                <span>👤 ${order.name} (${order.phone})</span>
+                <span style="font-size:11px; color:#666;">🕒 ${order.time}</span>
+              </div>
+              <div style="font-size:13px; color:#333; margin-bottom:6px;">📍 <b>Note:</b> ${order.address}</div>
+              <div style="margin-bottom:8px; background:#fff; padding:8px; border-radius:6px; border:1px solid #ffe082;">
+                <div style="font-size:13px; color:#444;">• ${order.items}</div>
+                <div style="margin-top:6px; font-weight:bold; color:#2e7d32; font-size:13px; text-align:right;">Total: ${order.total} (Incl. GST)</div>
+              </div>
+              <button class="btn" style="background:#25D366; font-size:12px; padding:7px;" onclick="sendQuotationToCustomer('${order.phone}', '${order.name}', '${order.items}', '${order.total}')">📲 Send Return Quotation to Customer</button>
+            </div>
+          `;
+        });
+        body.innerHTML = html;
+      } catch (err) {
+        console.error('Error fetching orders:', err);
+        body.innerHTML = '<p style="color:red; text-align:center; margin-top:50px;">Failed to load orders from cloud. Check API Key and Bin ID.</p>';
+      }
+    }
+
+    // Send Quotation directly to Customer WhatsApp
+    function sendQuotationToCustomer(phone, name, items, total) {
+      let msg = "🛒 *QUOTATION - SECURE ELECTRO CONTROLS*\n";
+      msg += "📍 *Sirsi (581401) | Ph: 7892369689*\n";
+      msg += "-----------------------------------\n";
+      msg += "👤 *Customer Name:* " + name + "\n";
+      msg += "📞 *Mobile Number:* " + phone + "\n";
+      msg += "-----------------------------------\n";
+      msg += "*Priced Items List:*\n";
+      msg += items + "\n";
+      msg += "-----------------------------------\n";
+      msg += "💰 *Grand Total:* " + total + " \n";
+      msg += "*(Inclusive of all taxes / With GST)*\n\n";
+      msg += "Thank you for choosing Secure Electro Controls!";
+
+      const url = "https://wa.me/" + phone + "?text=" + encodeURIComponent(msg);
+      window.open(url, '_blank');
     }
 
     function showToast(txt) {

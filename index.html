@@ -27,8 +27,15 @@
     }
     
     .card { background: white; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.06); padding: 12px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #eaeaea; }
-    .img-container { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; background: #fafafa; border-radius: 8px; overflow: hidden; margin-bottom: 8px; cursor: pointer; }
-    .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    
+    .img-container { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; background: #fafafa; border-radius: 8px; overflow: hidden; margin-bottom: 8px; cursor: pointer; position: relative; }
+    .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s ease; }
+    .img-container:hover img { transform: scale(1.05); }
+    
+    @media (min-width: 768px) {
+      .img-container { height: 160px; }
+      .card { padding: 15px; }
+    }
     
     .card h3 { font-size: 13px; margin: 6px 0; color: #1a237e; min-height: 35px; line-height: 1.3; font-weight: 600; }
     .card .category-tag { font-size: 10px; color: #555; background: #e8eaf6; padding: 3px 8px; border-radius: 4px; width: fit-content; margin-bottom: 6px; font-weight: 500; }
@@ -37,11 +44,14 @@
     .btn { background: #1976d2; color: white; border: none; padding: 9px 10px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 13px; font-weight: 600; transition: 0.2s; }
     .btn:hover { background: #115293; }
     .btn-whatsapp { background: #25D366; color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-whatsapp:hover { background: #20ba5a; }
 
     /* Modal Styling */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: flex-end; z-index: 1000; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: flex-end; z-index: 1000; backdrop-filter: blur(2px); }
     .modal-overlay.open { display: flex; }
-    .modal-content { background: white; width: 100%; max-width: 420px; height: 100%; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); }
+    .modal-content { background: white; width: 100%; max-width: 420px; height: 100%; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
     .modal-header { background: #0d47a1; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
     .close-btn { background: none; border: none; color: white; font-size: 26px; cursor: pointer; }
     .modal-body { padding: 15px 20px; flex: 1; overflow-y: auto; }
@@ -49,15 +59,19 @@
 
     .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px; }
     .qty-controls { display: flex; align-items: center; gap: 6px; }
-    .qty-btn { background: #e0e0e0; border: none; width: 24px; height: 24px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    .qty-btn { background: #e0e0e0; border: none; width: 26px; height: 26px; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
-    /* Image Zoom Modal */
-    .zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; }
-    .zoom-modal.open { display: flex; }
-    .zoom-content { max-width: 90%; max-height: 80vh; border-radius: 8px; background: white; padding: 10px; }
+    /* Image Zoom Lightbox Styles */
+    .img-zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px); }
+    .img-zoom-modal.open { display: flex; }
+    .img-zoom-content { max-width: 90%; max-height: 80vh; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); object-fit: contain; background: white; padding: 10px; }
+    .img-zoom-caption { position: absolute; bottom: 30px; color: white; font-size: 16px; font-weight: 600; text-align: center; background: rgba(0,0,0,0.6); padding: 8px 18px; border-radius: 20px; }
+    .close-zoom-btn { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; font-weight: bold; }
 
-    #toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2e7d32; color: white; padding: 10px 22px; border-radius: 30px; font-size: 14px; transition: 0.3s; opacity: 0; z-index: 3000; font-weight: 600; }
+    #toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2e7d32; color: white; padding: 10px 22px; border-radius: 30px; font-size: 14px; transition: 0.3s; opacity: 0; z-index: 3000; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    footer { text-align: center; padding: 18px; font-size: 12px; color: #666; background: #fff; border-top: 1px solid #eee; margin-top: 40px; }
   </style>
 </head>
 <body>
@@ -67,15 +81,15 @@
   <header>
     <div class="brand-title">
       <h1>Secure Electro Controls</h1>
-      <p>Smart Electricals & Automation | Sirsi</p>
+      <p>Smart Electricals & Automation | Sirsi (581340)</p>
     </div>
     <button class="action-btn" onclick="toggleCartModal()">
-      📋 My Requirement List <span class="badge-count" id="headerCount">0</span>
+      📋 Requirement List <span class="badge-count" id="headerCount">0</span>
     </button>
   </header>
 
   <div class="container">
-    <h2 style="font-size: 18px; color: #0d47a1; margin-bottom: 12px;">Products Catalog</h2>
+    <h2 style="font-size: 18px; color: #0d47a1; margin-bottom: 12px;">Electrical Products Catalog</h2>
     
     <div class="controls">
       <input type="text" id="searchInput" class="search-box" placeholder="Search items by name..." onkeyup="renderProducts()">
@@ -84,8 +98,15 @@
         <option value="Switches & Sockets">Switches & Sockets</option>
         <option value="Holders & Lighting">Holders & Lighting</option>
         <option value="Wires & Cables">Wires & Cables</option>
+        <option value="PVC Pipes & Fittings">PVC Pipes & Fittings</option>
+        <option value="Casing Patti & Fittings">Casing Patti & Fittings</option>
+        <option value="PVC Plates & Boxes">PVC Plates & Boxes</option>
+        <option value="Concealed Boxes">Concealed Boxes</option>
         <option value="MCB & RCCB">MCB & RCCB</option>
+        <option value="DB Boxes">DB Boxes</option>
+        <option value="CCTV & Home Automation">CCTV & Home Automation</option>
         <option value="Industrial Automation">Industrial Automation</option>
+        <option value="Motors & Controller">Motors & Controller</option>
       </select>
     </div>
     
@@ -103,20 +124,26 @@
         <p style="color:#777; text-align:center; margin-top:40px;">No items selected yet.</p>
       </div>
       <div class="modal-footer" id="cartModalFooter" style="display:none;">
-        <div style="margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px;">
-          <input type="text" id="custName" placeholder="Customer Name *" style="padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
-          <input type="text" id="custPhone" placeholder="Mobile Number *" style="padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;">
-          <textarea id="custAddress" placeholder="Delivery Location / Note *" rows="2" style="padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; resize:none;"></textarea>
+        <div style="margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px;">
+          <input type="text" id="custName" placeholder="Customer / Business Name *" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none;" required>
+          <input type="text" id="custPhone" placeholder="Mobile Number *" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none;" required>
+          <textarea id="custAddress" placeholder="Delivery Location / Special Note *" rows="2" style="padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; resize:none; outline: none;" required></textarea>
         </div>
-        <button class="btn-whatsapp" onclick="sendAutoQuotation()">Send Auto-Quotation via WhatsApp 💬</button>
+        <button class="btn-whatsapp" onclick="sendAutoQuotation()">Send Requirement to WhatsApp 💬</button>
       </div>
     </div>
   </div>
 
-  <!-- Image Zoom Modal -->
-  <div class="zoom-modal" id="zoomModal" onclick="closeZoom()">
-    <img class="zoom-content" id="zoomedImg" src="" alt="Zoom">
+  <!-- Image Zoom Lightbox Modal -->
+  <div class="img-zoom-modal" id="imgZoomModal" onclick="closeImageZoom()">
+    <span class="close-zoom-btn">&times;</span>
+    <img class="img-zoom-content" id="zoomedImage" src="" alt="Zoomed Product">
+    <div class="img-zoom-caption" id="zoomedCaption"></div>
   </div>
+
+  <footer>
+    <p>© Secure Electro Controls - Call: 7892369689</p>
+  </footer>
 
   <script>
     const defaultPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%230d47a1' stroke-width='1.5'><rect x='2' y='6' width='20' height='12' rx='2'/><circle cx='8' cy='12' r='2'/><circle cx='16' cy='12' r='2'/></svg>";
@@ -132,8 +159,9 @@
         })
         .catch(err => {
           console.error('Error loading products.json:', err);
-          document.getElementById('productGrid').innerHTML = '<p style="color:red; text-align:center;">Failed to load products.json</p>';
+          document.getElementById('productGrid').innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:red;">Failed to load products.json file.</p>';
         });
+      updateBadge();
     });
 
     function renderProducts() {
@@ -143,11 +171,13 @@
       grid.innerHTML = '';
 
       const filtered = products.filter(p => {
-        return p.name.toLowerCase().includes(search) && (cat === 'ALL' || p.category === cat);
+        const matchesSearch = p.name.toLowerCase().includes(search);
+        const matchesCat = (cat === 'ALL' || p.category === cat);
+        return matchesSearch && matchesCat;
       });
 
       if(filtered.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777;">No items found.</p>';
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777; padding:30px;">No matching items found.</p>';
         return;
       }
 
@@ -156,7 +186,7 @@
         grid.innerHTML += `
           <div class="card">
             <span class="category-tag">${prod.category || 'General'}</span>
-            <div class="img-container" onclick="openZoom('${imgSrc}')">
+            <div class="img-container" onclick="openImageZoom('${imgSrc}', '${prod.name.replace(/'/g, "\\'")}')">
               <img src="${imgSrc}" alt="${prod.name}" onerror="this.src='${defaultPlaceholder}'">
             </div>
             <h3>${prod.name}</h3>
@@ -167,15 +197,33 @@
       });
     }
 
+    function openImageZoom(imgSrc, name) {
+      const modal = document.getElementById('imgZoomModal');
+      const zoomedImg = document.getElementById('zoomedImage');
+      const caption = document.getElementById('zoomedCaption');
+      
+      zoomedImg.src = imgSrc;
+      caption.innerText = name;
+      modal.classList.add('open');
+    }
+
+    function closeImageZoom() {
+      document.getElementById('imgZoomModal').classList.remove('open');
+    }
+
     function addToCart(id) {
       const item = products.find(p => p.id === id);
       if(!item) return;
+      
       if(cart[id]) {
         cart[id].qty += 1;
       } else {
         cart[id] = { id: item.id, name: item.name, price: item.price, qty: 1 };
       }
       updateBadge();
+      if(document.getElementById('cartModal').classList.contains('open')) {
+        renderCartContent();
+      }
       showToast(`Added: ${item.name}`);
     }
 
@@ -224,7 +272,7 @@
           <div class="cart-item">
             <div>
               <div style="font-weight:600; color:#1a237e;">${item.name}</div>
-              <div style="font-size:12px; color:#555; margin-top:3px;">Quantity: ${item.qty}</div>
+              <div style="font-size:12px; color:#666; margin-top:3px;">Quantity: ${item.qty}</div>
             </div>
             <div class="qty-controls">
               <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
@@ -245,16 +293,16 @@
       const address = document.getElementById('custAddress').value.trim();
 
       if(!name || !phone || !address) {
-        alert("Please fill in Name, Mobile Number and Location/Note!");
+        alert("Please fill in Customer Name, Mobile Number, and Location/Note!");
         return;
       }
 
-      let msg = `📋 *Quotation Reply - Secure Electro Controls*\n\n`;
-      msg += `👤 *Customer Name:* ${name}\n`;
-      msg += `📞 *Contact:* ${phone}\n`;
-      msg += `📍 *Note:* ${address}\n\n`;
-      msg += `-----------------------------------\n`;
-      msg += `*Priced Items List:*\n`;
+      let msg = "🛒 *Quotation Reply - Secure Electro Controls*\n\n";
+      msg += "👤 *Customer Name:* " + name + "\n";
+      msg += "📞 *Contact:* " + phone + "\n";
+      msg += "📍 *Note:* " + address + "\n\n";
+      msg += "-----------------------------------\n";
+      msg += "*Priced Items List:*\n";
 
       let grandTotal = 0;
       let count = 1;
@@ -263,37 +311,25 @@
         let item = cart[k];
         let itemTotal = item.price * item.qty;
         grandTotal += itemTotal;
-        msg += `${count}. ${item.name}\n   - Rate: ₹${item.price} x ${item.qty} = ₹${itemTotal}\n`;
+        msg += count + ". " + item.name + "\n   - Rate: Rs." + item.price + " x " + item.qty + " = Rs." + itemTotal + "\n";
         count++;
       });
 
-      msg += `-----------------------------------\n`;
-      msg += `💰 *Total Quotation Amount: ₹${grandTotal}*\n\n`;
-      msg += `Thank you for choosing Secure Electro Controls!`;
+      msg += "-----------------------------------\n";
+      msg += "💰 *Total Quotation Amount: Rs." + grandTotal + "*\n\n";
+      msg += "Thank you for choosing Secure Electro Controls!";
 
       const shopPhone = "917892369689"; 
-      const url = `https://wa.me/${shopPhone}?text=${encodeURIComponent(urlEncodeCustom(msg))}`;
+      const url = "https://wa.me/" + shopPhone + "?text=" + encodeURIComponent(msg);
+      
       window.open(url, '_blank');
-    }
-
-    function urlEncodeCustom(str) {
-      return encodeURIComponent(str);
-    }
-
-    function openZoom(src) {
-      document.getElementById('zoomedImg').src = src;
-      document.getElementById('zoomModal').classList.add('open');
-    }
-
-    function closeZoom() {
-      document.getElementById('zoomModal').classList.remove('open');
     }
 
     function showToast(txt) {
       const t = document.getElementById('toast');
       t.innerText = txt;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2000);
+      setTimeout(() => t.classList.remove('show'), 1500);
     }
   </script>
 </body>

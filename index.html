@@ -364,7 +364,7 @@
       footer.style.display = 'block';
     }
 
-    // Customer requirement submission (Without ID number)
+    // Customer requirement submission
     async function submitOrderToCloudBin() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
@@ -447,9 +447,8 @@
       msg += "*Required Items List:*\n\n";
 
       orderItems.forEach((item, index) => {
-        msg += `🔸 *${index + 1}. ${item.name}*\n`;
-        msg += `    • Quantity : ${item.qty}\n`;
-        msg += "-----------------------------------\n";
+        msg += `${index + 1}. ${item.name}\n`;
+        msg += `   Qty: ${item.qty}\n\n`;
       });
 
       msg += "Please send the quotation including price and GST details.";
@@ -476,7 +475,7 @@
         const orders = data.record || [];
 
         if (orders.length === 0) {
-          body.innerHTML = '<p style="color:#777; text-align:center; margin-top:50px;">No orders found in cloud database.</p>';
+          body.innerHTML = '<p style="text-align:center; color:#777; margin-top:50px;">No orders found in cloud database.</p>';
           return;
         }
 
@@ -485,7 +484,7 @@
           let itemsHtml = '';
           if (order.itemsList && Array.isArray(order.itemsList)) {
             order.itemsList.forEach((it, idx) => {
-              itemsHtml += `<div style="font-size:13px; color:#444;">• ${idx + 1}. ${it.name} (Qty: ${it.qty}) - Rate: ₹${it.rate} = ₹${it.total}</div>`;
+              itemsHtml += `<div style="font-size:13px; color:#444;">• ${idx + 1}. ${it.name} (${it.qty} x ₹${it.rate} = ₹${it.total})</div>`;
             });
           } else {
             itemsHtml = `<div style="font-size:13px; color:#444;">• ${order.items || 'Items list'}</div>`;
@@ -553,7 +552,7 @@
       }
     }
 
-    // Admin returns Quotation formatted in Clean Card List style (Without ID number)
+    // Admin returns Quotation in simple Qty x Rate = Total format
     function sendQuotationToCustomer(orderId) {
       const orders = window.currentOrdersList || [];
       const order = orders.find(o => Number(o.id) === Number(orderId));
@@ -574,14 +573,12 @@
 
       if (order.itemsList && Array.isArray(order.itemsList)) {
         order.itemsList.forEach((it, idx) => {
-          msg += `🔸 *${idx + 1}. ${it.name}*\n`;
-          msg += `    • Qty    : ${it.qty}\n`;
-          msg += `    • Rate   : ₹${it.rate}\n`;
-          msg += `    • Total  : ₹${it.total}\n`;
-          msg += "-----------------------------------\n";
+          msg += `${idx + 1}. *${it.name}*\n`;
+          msg += `   ${it.qty} x ₹${it.rate} = ₹${it.total}/-\n\n`;
         });
       }
 
+      msg += "-----------------------------------\n";
       msg += "📦 *Subtotal (Excl. GST):* ₹" + (order.basicTotal || 0) + "/-\n";
       msg += "➕ *CGST (9%):* ₹" + (order.cgst || 0) + "/-\n";
       msg += "➕ *SGST (9%):* ₹" + (order.sgst || 0) + "/-\n";

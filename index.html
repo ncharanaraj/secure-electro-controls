@@ -76,7 +76,7 @@
 </head>
 <body>
 
-  <div id="toast">✅ Order Saved Successfully!</div>
+  <div id="toast">Order Saved Successfully!</div>
 
   <header>
     <div class="brand-title">
@@ -84,7 +84,7 @@
       <p>Smart Electricals & Automation | Sirsi (581340)</p>
     </div>
     <button class="action-btn" onclick="toggleCartModal()">
-      📋 List <span class="badge-count" id="headerCount">0</span>
+      List <span class="badge-count" id="headerCount">0</span>
     </button>
   </header>
 
@@ -119,7 +119,7 @@
   <div class="modal-overlay" id="cartModal" onclick="handleOverlayClick(event)">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 style="font-size:16px; margin:0;">📋 Selected Requirement List</h2>
+        <h2 style="font-size:16px; margin:0;">Selected Requirement List</h2>
         <button class="close-btn" onclick="toggleCartModal()">&times;</button>
       </div>
       <div class="modal-body" id="cartModalItems">
@@ -139,7 +139,7 @@
   <!-- Secret Password Prompt Modal -->
   <div class="admin-password-modal" id="pwdModal" onclick="handlePwdOverlay(event)">
     <div class="admin-pwd-box">
-      <h3 style="margin-top:0; color:#0d47a1; font-size:16px;">🔐 Admin Access</h3>
+      <h3 style="margin-top:0; color:#0d47a1; font-size:16px;">Admin Access</h3>
       <p style="font-size:12px; color:#666; margin-bottom:12px;">Enter Admin Password to view orders.</p>
       <input type="password" id="adminPasswordInput" placeholder="Enter Password" style="width:100%; padding:9px; border:1px solid #ccc; border-radius:6px; font-size:14px; text-align:center; margin-bottom:12px; outline:none;">
       <button class="btn" onclick="verifyAdminPassword()">Login</button>
@@ -150,7 +150,7 @@
   <div class="orders-modal" id="ordersModal" onclick="handleOrdersOverlay(event)">
     <div class="orders-container" onclick="event.stopPropagation()">
       <div class="modal-header" style="background: #37474f;">
-        <h2 style="font-size:16px; margin:0;">🔐 Admin Orders Dashboard (Cloud Sync)</h2>
+        <h2 style="font-size:16px; margin:0;">Admin Orders Dashboard (Cloud Sync)</h2>
         <button class="close-btn" onclick="toggleOrdersModal()">&times;</button>
       </div>
       <div class="modal-body" id="ordersListBody" style="background: #f9f9f9;">
@@ -171,9 +171,9 @@
   </footer>
 
   <script>
-    // ⚠️ ನಿಮ್ಮ ನಿಖರವಾದ JSONBin Details ಅನ್ನು ಇಲ್ಲಿ ಹಾಕಿರಿ
-    const BIN_ID = "6ae9c1b2ac6210605a68760c";
-    const MASTER_KEY = "$2a$10$6XiRSIncaLwwkUOgVP.QFuGXV8cijDYq8amCJi/pVgZ.5QlSuIup6";
+    // Insert your JSONBin details here
+    const BIN_ID = "YOUR_BIN_ID_HERE";
+    const MASTER_KEY = "YOUR_JSONBIN_MASTER_KEY_HERE";
 
     const defaultPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%230d47a1' stroke-width='1.5'><rect x='2' y='6' width='20' height='12' rx='2'/><circle cx='8' cy='12' r='2'/><circle cx='16' cy='12' r='2'/></svg>";
     let products = [];
@@ -253,7 +253,7 @@
               <img src="${imgSrc}" alt="${prod.name}" onerror="this.src='${defaultPlaceholder}'">
             </div>
             <h3>${prod.name}</h3>
-            <div class="price-tag">🔒 Price on Request</div>
+            <div class="price-tag">Price on Request</div>
             <button class="btn" onclick="addToCart(${prod.id})">+ Add to List</button>
           </div>
         `;
@@ -353,7 +353,7 @@
       footer.style.display = 'block';
     }
 
-    // Submit Order to Cloud JSONBin & WhatsApp (Without Price)
+    // Submit Order to Cloud JSONBin & WhatsApp
     async function submitOrderToCloudBin() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
@@ -381,13 +381,14 @@
           total: itemTotalWithoutTax
         });
 
-        itemsDetails.push(`${item.name} - Qty: ${item.qty} @ ₹${itemRate}`);
+        itemsDetails.push(`${item.name} (Qty: ${item.qty})`);
       });
 
-      // GST Calculation (Assuming 18% Total GST -> 9% CGST + 9% SGST)
       let cgst = basicSubtotal * 0.09;
       let sgst = basicSubtotal * 0.09;
       let grandTotal = basicSubtotal + cgst + sgst;
+
+      let itemsStr = itemsDetails.join(", ");
 
       const newOrder = {
         id: Date.now(),
@@ -396,6 +397,7 @@
         phone: phone,
         address: address,
         itemsList: orderItems,
+        items: itemsStr,
         basicTotal: basicSubtotal.toFixed(2),
         cgst: cgst.toFixed(2),
         sgst: sgst.toFixed(2),
@@ -424,7 +426,6 @@
         console.error('Cloud Sync Error:', err);
       }
 
-      // WhatsApp message to shop owner (Without price)
       let msg = "📋 *NEW REQUIREMENT INQUIRY*\n";
       msg += "🏢 *Secure Electro Controls*\n";
       msg += "-----------------------------------\n";
@@ -439,7 +440,7 @@
       });
 
       msg += "-----------------------------------\n";
-      msg += "Please check admin dashboard and send quotation.";
+      msg += "Please send the quotation including price and GST details.";
 
       const shopPhone = "917892369689";
       const url = "https://wa.me/" + shopPhone + "?text=" + encodeURIComponent(msg);
@@ -448,7 +449,7 @@
       cart = {};
       updateBadge();
       toggleCartModal();
-      showToast("✅ Requirement Sent to Shop!");
+      showToast("Requirement Sent to Shop!");
     }
 
     // Fetch live orders from JSONBin when Admin logs in
@@ -480,9 +481,6 @@
             itemsHtml = `<div style="font-size:13px; color:#444;">• ${order.items || 'Items list'}</div>`;
           }
 
-          // Encode order data safely for the quotation button
-          let orderJson = encodeURIComponent(JSON.stringify(order));
-
           html += `
             <div class="order-card-box" id="order-${order.id}">
               <div style="display:flex; justify-content:space-between; font-weight:bold; color:#0d47a1; margin-bottom:6px; font-size:14px;">
@@ -496,7 +494,7 @@
                 <div style="font-size:12px; color:#555;">Subtotal (Without GST): ₹${order.basicTotal || 0}</div>
                 <div style="font-size:12px; color:#555;">CGST (9%): ₹${order.cgst || 0}</div>
                 <div style="font-size:12px; color:#555;">SGST (9%): ₹${order.sgst || 0}</div>
-                <div style="margin-top:4px; font-weight:bold; color:#2e7d32; font-size:13px; text-align:right;">Grand Total: ₹${order.grandTotal || order.total}</div>
+                <div style="margin-top:4px; font-weight:bold; color:#2e7d32; font-size:13px; text-align:right;">Grand Total: ₹${order.grandTotal || 0}</div>
               </div>
               <div style="display: flex; gap: 8px;">
                 <button class="btn" style="background:#25D366; font-size:12px; padding:7px; flex: 1;" onclick='sendQuotationToCustomer(${order.id})'>📲 Send Return Quotation to Customer</button>
@@ -505,7 +503,7 @@
             </div>
           `;
         });
-        window.currentOrdersList = orders; // Store globally for easy retrieval
+        window.currentOrdersList = orders;
         body.innerHTML = html;
       } catch (err) {
         console.error('Error fetching orders:', err);

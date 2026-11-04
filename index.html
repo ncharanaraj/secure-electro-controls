@@ -147,11 +147,15 @@
   </div>
 
   <!-- Admin Orders Dashboard Modal -->
-  <div class="orders-modal" id="ordersModal" onclick="handleOrdersOverlay(event)">
-    <div class="orders-container" onclick="event.stopPropagation()">
-      <div class="modal-header" style="background: #37474f;">
-        <h2 style="font-size:16px; margin:0;">Admin Orders Dashboard (Cloud Sync)</h2>
-        <button class="close-btn" onclick="toggleOrdersModal()">&times;</button>
+  <div class="orders-modal" id="ordersModal" onclick="closeOrdersModalOnOutsideClick(event)">
+    <div class="orders-container">
+      <div class="modal-header" style="background: #37474f; display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="font-size:16px; margin:0;">Admin Dashboard</h2>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button onclick="fetchCloudOrders()" style="background: #ff9800; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">🔄 Refresh</button>
+          <button onclick="adminLogout()" style="background: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;">🔒 Logout</button>
+          <button class="close-btn" onclick="toggleOrdersModal()">&times;</button>
+        </div>
       </div>
       <div class="modal-body" id="ordersListBody" style="background: #f9f9f9;">
         <p style="text-align:center; color:#777; margin-top:40px;">Loading orders from Cloud...</p>
@@ -171,7 +175,6 @@
   </footer>
 
   <script>
-    // Insert your JSONBin details here
     const BIN_ID = "6ae9c1b2ac6210605a68760c";
     const MASTER_KEY = "$2a$10$6XiRSIncaLwwkUOgVP.QFuGXV8cijDYq8amCJi/pVgZ.5QlSuIup6";
 
@@ -221,10 +224,16 @@
       if(pwd === 'sec1994') {
         document.getElementById('pwdModal').classList.remove('open');
         document.getElementById('adminPasswordInput').value = '';
+        document.getElementById('ordersModal').classList.add('open');
         fetchCloudOrders();
       } else {
         alert("Incorrect Password!");
       }
+    }
+
+    function adminLogout() {
+      document.getElementById('ordersModal').classList.remove('open');
+      showToast("🔒 Logged out successfully!");
     }
 
     function renderProducts() {
@@ -312,12 +321,14 @@
       modal.classList.toggle('open');
     }
 
-    function handleOverlayClick(e) {
-      if(e.target.id === 'cartModal') toggleCartModal();
+    function closeOrdersModalOnOutsideClick(e) {
+      if(e.target.id === 'ordersModal') {
+        toggleOrdersModal();
+      }
     }
 
-    function handleOrdersOverlay(e) {
-      if(e.target.id === 'ordersModal') toggleOrdersModal();
+    function handleOverlayClick(e) {
+      if(e.target.id === 'cartModal') toggleCartModal();
     }
 
     function renderCartContent() {
@@ -353,7 +364,6 @@
       footer.style.display = 'block';
     }
 
-    // Submit Order to Cloud JSONBin & WhatsApp
     async function submitOrderToCloudBin() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
@@ -375,6 +385,7 @@
         basicSubtotal += itemTotalWithoutTax;
 
         orderItems.push({
+          id: item.id,
           name: item.name,
           qty: item.qty,
           rate: itemRate,
@@ -452,9 +463,7 @@
       showToast("Requirement Sent to Shop!");
     }
 
-    // Fetch live orders from JSONBin when Admin logs in
     async function fetchCloudOrders() {
-      toggleOrdersModal();
       const body = document.getElementById('ordersListBody');
       body.innerHTML = '<p style="text-align:center; color:#777; margin-top:40px;">Fetching live orders from Cloud...</p>';
 
@@ -466,7 +475,7 @@
         const orders = data.record || [];
 
         if (orders.length === 0) {
-          body.innerHTML = '<p style="color:#777; text-align:center; margin-top:50px;">No orders found in cloud database.</p>';
+          body.innerHTML = '<p style="text-align:center; color:#777; margin-top:50px;">No orders found in cloud database.</p>';
           return;
         }
 
@@ -475,7 +484,7 @@
           let itemsHtml = '';
           if (order.itemsList && Array.isArray(order.itemsList)) {
             order.itemsList.forEach((it, idx) => {
-              itemsHtml += `<div style="font-size:13px; color:#444;">• ${idx + 1}. ${it.name} (Qty: ${it.qty}) - Rate: ₹${it.rate} = ₹${it.total}</div>`;
+              itemsHtml += `<div style="font-size:13px; color:#444;">• ${idx + 1}. [ID: ${it.id || '-'}] ${it.name} (Qty: ${it.qty}) - Rate: ₹${it.rate} = ₹${it.total}</div>`;
             });
           } else {
             itemsHtml = `<div style="font-size:13px; color:#444;">• ${order.items || 'Items list'}</div>`;
@@ -505,13 +514,13 @@
         });
         window.currentOrdersList = orders;
         body.innerHTML = html;
+        showToast("Orders refreshed successfully!");
       } catch (err) {
         console.error('Error fetching orders:', err);
         body.innerHTML = '<p style="color:red; text-align:center; margin-top:50px;">Failed to load orders from cloud. Check API Key and Bin ID.</p>';
       }
     }
 
-    // Delete Order from Cloud JSONBin securely
     async function deleteCloudOrder(event, orderId) {
       if(event) event.stopPropagation();
       if(!confirm("Are you sure you want to delete this order?")) return;
@@ -543,7 +552,6 @@
       }
     }
 
-    // Send Professional Quotation with Separate GST to Customer WhatsApp
     function sendQuotationToCustomer(orderId) {
       const orders = window.currentOrdersList || [];
       const order = orders.find(o => Number(o.id) === Number(orderId));
@@ -558,19 +566,28 @@
       msg += "👤 *Customer Name:* " + order.name + "\n";
       msg += "📞 *Mobile Number:* " + order.phone + "\n";
       msg += "🕒 *Date:* " + order.time + "\n";
-      msg += "-----------------------------------\n";
-      msg += "*Itemized Details:*\n";
+      msg += "-----------------------------------\n\n";
+      
+      msg += "*Itemized Excel Sheet Format:*\n";
+      msg += "```\n";
+      msg += "No. | Item ID | Item Name     | Qty | Rate   | Total\n";
+      msg += "----|---------|---------------|-----|--------|-------\n";
 
       if (order.itemsList && Array.isArray(order.itemsList)) {
         order.itemsList.forEach((it, idx) => {
-          msg += (idx + 1) + ". " + it.name + "\n";
-          msg += "   - Qty: " + it.qty + " x ₹" + it.rate + " = ₹" + it.total + "\n";
+          let slNo = String(idx + 1).padEnd(3, ' ');
+          let itemId = String(it.id || '-').padEnd(7, ' ');
+          let itemName = String(it.name).substring(0, 13).padEnd(13, ' ');
+          let qty = String(it.qty).padEnd(3, ' ');
+          let rate = String("₹" + it.rate).padEnd(6, ' ');
+          let total = String("₹" + it.total);
+          
+          msg += `${slNo} | ${itemId} | ${itemName} | ${qty} | ${rate} | ${total}\n`;
         });
-      } else {
-        msg += order.items + "\n";
       }
-
-      msg += "-----------------------------------\n";
+      
+      msg += "--------------------------------------------------\n";
+      msg += "```\n";
       msg += "📦 *Subtotal (Excl. GST):* ₹" + (order.basicTotal || 0) + "/-\n";
       msg += "➕ *CGST (9%):* ₹" + (order.cgst || 0) + "/-\n";
       msg += "➕ *SGST (9%):* ₹" + (order.sgst || 0) + "/-\n";

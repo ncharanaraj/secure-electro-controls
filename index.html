@@ -448,7 +448,8 @@
 
       orderItems.forEach((item, index) => {
         msg += `${index + 1}. ${item.name}\n`;
-        msg += `   Qty: ${item.qty}\n\n`;
+        msg += `   Qty: ${item.qty}\n`;
+        msg += "-----------------------------------\n";
       });
 
       msg += "Please send the quotation including price and GST details.";
@@ -552,7 +553,7 @@
       }
     }
 
-    // Admin returns Quotation in simple Qty x Rate = Total format
+    // Admin returns Quotation with dotted lines between each item
     function sendQuotationToCustomer(orderId) {
       const orders = window.currentOrdersList || [];
       const order = orders.find(o => Number(o.id) === Number(orderId));
@@ -574,11 +575,11 @@
       if (order.itemsList && Array.isArray(order.itemsList)) {
         order.itemsList.forEach((it, idx) => {
           msg += `${idx + 1}. *${it.name}*\n`;
-          msg += `   ${it.qty} x ₹${it.rate} = ₹${it.total}/-\n\n`;
+          msg += `   ${it.qty} x ₹${it.rate} = ₹${it.total}/-\n`;
+          msg += "-----------------------------------\n";
         });
       }
 
-      msg += "-----------------------------------\n";
       msg += "📦 *Subtotal (Excl. GST):* ₹" + (order.basicTotal || 0) + "/-\n";
       msg += "➕ *CGST (9%):* ₹" + (order.cgst || 0) + "/-\n";
       msg += "➕ *SGST (9%):* ₹" + (order.sgst || 0) + "/-\n";

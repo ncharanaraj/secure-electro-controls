@@ -178,7 +178,7 @@
     const BIN_ID = "6ae9c1b2ac6210605a68760c";
     const MASTER_KEY = "$2a$10$6XiRSIncaLwwkUOgVP.QFuGXV8cijDYq8amCJi/pVgZ.5QlSuIup6";
 
-    const defaultPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%230d47a1' stroke-width='1.5'><rect x='2' y='6' width='20' height='12' rx='2'/><circle cx='8' cy='12' r='2'/><circle cx='16' cy='12' r='2'/></svg>";
+    const defaultPlaceholder = "data:image/svg+xml;utf8,<svg xmlns='[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%230d47a1' stroke-width='1.5'><rect x='2' y='6' width='20' height='12' rx='2'/><circle cx='8' cy='12' r='2'/><circle cx='16' cy='12' r='2'/></svg>";
     let products = [];
     let cart = {};
     let footerClicks = 0;
@@ -364,6 +364,7 @@
       footer.style.display = 'block';
     }
 
+    // Customer sends requirement in Excel Table format to WhatsApp
     async function submitOrderToCloudBin() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
@@ -416,7 +417,7 @@
       };
 
       try {
-        const getRes = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        const getRes = await fetch(`[https://api.jsonbin.io/v3/b/$](https://api.jsonbin.io/v3/b/$){BIN_ID}/latest`, {
           headers: { 'X-Master-Key': MASTER_KEY }
         });
         const getData = await getRes.json();
@@ -425,7 +426,7 @@
 
         existingOrders.unshift(newOrder);
 
-        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        await fetch(`[https://api.jsonbin.io/v3/b/$](https://api.jsonbin.io/v3/b/$){BIN_ID}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -437,6 +438,7 @@
         console.error('Cloud Sync Error:', err);
       }
 
+      // Format WhatsApp Requirement Message into Monospace Excel Table
       let msg = "📋 *NEW REQUIREMENT INQUIRY*\n";
       msg += "🏢 *Secure Electro Controls*\n";
       msg += "-----------------------------------\n";
@@ -445,16 +447,24 @@
       msg += "📍 *Location / Note:* " + address + "\n";
       msg += "-----------------------------------\n";
       msg += "*Required Items List:*\n";
+      msg += "```\n";
+      msg += "No. | Item ID | Item Name     | Qty\n";
+      msg += "----|---------|---------------|----\n";
 
       orderItems.forEach((item, index) => {
-        msg += (index + 1) + ". " + item.name + " - Qty: " + item.qty + "\n";
+        let slNo = String(index + 1).padEnd(3, ' ');
+        let itemId = String(item.id || '-').padEnd(7, ' ');
+        let itemName = String(item.name).substring(0, 13).padEnd(13, ' ');
+        let qty = String(item.qty);
+        msg += `${slNo} | ${itemId} | ${itemName} | ${qty}\n`;
       });
 
+      msg += "```\n";
       msg += "-----------------------------------\n";
       msg += "Please send the quotation including price and GST details.";
 
       const shopPhone = "917892369689";
-      const url = "https://wa.me/" + shopPhone + "?text=" + encodeURIComponent(msg);
+      const url = "[https://wa.me/](https://wa.me/)" + shopPhone + "?text=" + encodeURIComponent(msg);
       window.open(url, '_blank');
 
       cart = {};
@@ -468,7 +478,7 @@
       body.innerHTML = '<p style="text-align:center; color:#777; margin-top:40px;">Fetching live orders from Cloud...</p>';
 
       try {
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        const res = await fetch(`[https://api.jsonbin.io/v3/b/$](https://api.jsonbin.io/v3/b/$){BIN_ID}/latest`, {
           headers: { 'X-Master-Key': MASTER_KEY }
         });
         const data = await res.json();
@@ -527,7 +537,7 @@
 
       try {
         showToast("⏳ Deleting order...");
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        const res = await fetch(`[https://api.jsonbin.io/v3/b/$](https://api.jsonbin.io/v3/b/$){BIN_ID}/latest`, {
           headers: { 'X-Master-Key': MASTER_KEY }
         });
         const data = await res.json();
@@ -535,7 +545,7 @@
 
         orders = orders.filter(o => Number(o.id) !== Number(orderId));
 
-        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        await fetch(`[https://api.jsonbin.io/v3/b/$](https://api.jsonbin.io/v3/b/$){BIN_ID}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -552,6 +562,7 @@
       }
     }
 
+    // Admin sends Return Quotation in Monospace Excel Table to Customer
     function sendQuotationToCustomer(orderId) {
       const orders = window.currentOrdersList || [];
       const order = orders.find(o => Number(o.id) === Number(orderId));
@@ -596,7 +607,7 @@
       msg += "*(Inclusive of all taxes)*\n\n";
       msg += "Thank you for choosing Secure Electro Controls!";
 
-      const url = "https://wa.me/" + order.phone + "?text=" + encodeURIComponent(msg);
+      const url = "[https://wa.me/](https://wa.me/)" + order.phone + "?text=" + encodeURIComponent(msg);
       window.open(url, '_blank');
     }
 
